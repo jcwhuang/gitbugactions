@@ -12,6 +12,7 @@ class MyRepository:
     stargazers_count: int
     language: str
     size: str
+    pull_number: int
 
 
 def handle_repos(
