@@ -51,7 +51,7 @@ class CollectReposStrategy(RepoStrategy):
 
         repo_clone = clone_repo(repo.clone_url, repo_path)
         logging.info(f"Checkout out at commit: {commit}")
-        repo_clone = checkout_commit(repo_clone, commit)
+        checkout_commit(repo_clone, commit)
 
         try:
             data["clone_success"] = True

@@ -14,7 +14,7 @@ class MyRepository:
 
 
 def handle_repos(
-    prdata_filename, out_path: str = "./out/"
+    prdata_filename: str, out_path: str = "./out/"
 ):
     strategy = CollectReposStrategy(out_path)
     with open(prdata_filename) as f:
