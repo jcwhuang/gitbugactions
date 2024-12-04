@@ -3,6 +3,9 @@ import re
 import shutil
 import os, subprocess, threading
 import traceback
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class Action:
@@ -25,11 +28,11 @@ class Action:
         """
         from gitbugactions.util import clone_repo
 
-        logging.info(f"Downloading action {self.declaration} to {action_dir}")
+        logger.info(f"Downloading action {self.declaration} to {action_dir}")
 
         # If the action is already in the cache, raise an exception
         if os.path.exists(action_dir):
-            logging.warning(f"Action directory already exists: {action_dir}")
+            logger.warning(f"Action directory already exists: {action_dir}")
             return
 
         try:

@@ -14,6 +14,9 @@ from gitbugactions.actions.actions import (
     ActCheckCodeFailureStrategy,
 )
 from gitbugactions.infra.infra_checkers import is_infra_file
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class CollectReposStrategy(RepoStrategy):
@@ -31,7 +34,7 @@ class CollectReposStrategy(RepoStrategy):
             json.dump(data, f, indent=4)
 
     def handle_repo(self, repo: Repository, commit: str):
-        logging.info(f"Cloning {repo.full_name} - {repo.clone_url}")
+        logger.info(f"Cloning {repo.full_name} - {repo.clone_url}")
         repo_path = os.path.join(
             tempfile.gettempdir(), self.uuid, repo.full_name.replace("/", "-")
         )
@@ -51,7 +54,7 @@ class CollectReposStrategy(RepoStrategy):
         }
 
         repo_clone = clone_repo(repo.clone_url, repo_path)
-        logging.info(f"Checkout out at commit: {commit}")
+        logger.info(f"Checkout out at commit: {commit}")
         checkout_commit(repo_clone, commit)
 
         try:
@@ -69,11 +72,11 @@ class CollectReposStrategy(RepoStrategy):
             actions.save_workflows()
             num_test_workflows = len(actions.test_workflows)
             if num_test_workflows > 0:
-                logging.info(
+                logger.info(
                     f"Running {num_test_workflows} actions for {repo.full_name}"
                 )
                 for i, test_workflow in enumerate(actions.test_workflows):
-                    logging.info(f"Running test workflow {i}: {test_workflow.path}")
+                    logger.info(f"Running test workflow {i}: {test_workflow.path}")
                     # Act creates names for the containers by hashing the content of the workflows
                     # To avoid conflicts between threads, we randomize the name
                     actions.test_workflows[i].doc["name"] = str(uuid.uuid4())
@@ -90,7 +93,7 @@ class CollectReposStrategy(RepoStrategy):
                     data["actions_successful"][test_workflow.path] = not act_run.failed
                     data["actions_run"][test_workflow.path] = act_run.asdict()
             else:
-                logging.info("No test workflows")
+                logger.info("No test workflows")
             delete_repo_clone(repo_clone)
             self.save_data(data, repo)
 
@@ -119,7 +122,7 @@ class CollectInfraReposStrategy(CollectReposStrategy):
         actions.save_workflows()
 
         if len(actions.workflows) >= 1:
-            logging.info(f"Running actions for {repo.full_name}")
+            logger.info(f"Running actions for {repo.full_name}")
 
             for workflow in actions.workflows:
                 # Act creates names for the containers by hashing the content of the workflows
@@ -145,7 +148,7 @@ class CollectInfraReposStrategy(CollectReposStrategy):
                 data["actions_successful"] = False
 
     def handle_repo(self, repo: Repository):
-        logging.info(f"Cloning {repo.full_name} - {repo.clone_url}")
+        logger.info(f"Cloning {repo.full_name} - {repo.clone_url}")
         repo_path = os.path.join(
             tempfile.gettempdir(), self.uuid, repo.full_name.replace("/", "-")
         )

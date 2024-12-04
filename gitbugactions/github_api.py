@@ -7,6 +7,9 @@ from typing import List
 from github import Github, RateLimitExceededException
 from datetime import datetime
 from functools import partial
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class RateLimiter:
@@ -40,7 +43,7 @@ class RateLimiter:
                 return fn(*args, **kwargs)
             except RateLimitExceededException as exc:
                 with self.lock:
-                    logging.warning(f"Github Rate Limit Exceeded: {exc.headers}")
+                    logger.warning(f"Github Rate Limit Exceeded: {exc.headers}")
                     reset_time = datetime.fromtimestamp(
                         int(exc.headers["x-ratelimit-reset"])
                     )

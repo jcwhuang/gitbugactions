@@ -5,6 +5,9 @@ from junitparser import TestCase
 from typing import List, Set
 from gitbugactions.github_api import GithubToken
 from gitbugactions.actions.action import Action
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class GitHubWorkflow(ABC):
@@ -82,9 +85,7 @@ class GitHubWorkflow(ABC):
                             try:
                                 action = Action(step["uses"])
                             except Exception:
-                                logging.warning(
-                                    f"Failed to parse action {step['uses']}"
-                                )
+                                logger.warning(f"Failed to parse action {step['uses']}")
                                 continue
                             actions.add(action)
 

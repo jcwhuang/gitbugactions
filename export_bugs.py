@@ -18,6 +18,9 @@ from gitbugactions.docker.client import DockerClient
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from gitbugactions.actions.actions import ActCacheDirManager, ActTestsRun
 from collect_bugs import BugPatch
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 diff_file_lock = threading.Lock()
 
@@ -78,7 +81,7 @@ def export_bug_containers(bug: Dict, export_path: str):
     TestExecutor.toggle_cleanup(False)
     repo_full_name = bug["repository"]
     commit_hash = bug["commit_hash"]
-    logging.info(f"Exporting {commit_hash} from {repo_full_name}...")
+    logger.info(f"Exporting {commit_hash} from {repo_full_name}...")
     temp_path = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
     repo_clone = clone_repo(f"https://github.com/{repo_full_name}", temp_path)
     first_commit = repo_clone.revparse_single(str(repo_clone.head.target))

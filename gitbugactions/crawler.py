@@ -10,7 +10,9 @@ from gitbugactions.github_api import GithubAPI
 
 
 # FIXME change to custom logger
-logging.basicConfig(level=logging.INFO)
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class RepoStrategy(ABC):
@@ -92,7 +94,7 @@ class RepoCrawler:
         return (start_date.isoformat(), end_date.isoformat())
 
     def __search_repos(self, query: str, repo_strategy: RepoStrategy):
-        logging.info(f"Searching repos with query: {query}")
+        logger.info(f"Searching repos with query: {query}")
         page_list = self.github.search_repositories(query)
         totalCount = self.github.token.search_rate_limiter.request(
             getattr, page_list, "totalCount"
@@ -101,7 +103,7 @@ class RepoCrawler:
             logging.error(f'Search "{query}" failed')
             return
         elif totalCount == 1000:
-            logging.warning(
+            logger.warning(
                 f"1000 results limit of the GitHub API was reached.\nQuery: {query}"
             )
         n_pages = math.ceil(totalCount / RepoCrawler.__PAGE_SIZE)

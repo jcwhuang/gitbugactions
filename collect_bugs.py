@@ -40,6 +40,9 @@ from gitbugactions.collect_bugs.collection_strategies import *
 from gitbugactions.collect_bugs.test_config import TestConfig
 from gitbugactions.collect_bugs.bug_patch import BugPatch
 from concurrent.futures import ThreadPoolExecutor, Future, as_completed
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class PatchCollector:
@@ -69,7 +72,7 @@ class PatchCollector:
                     tempfile.gettempdir(), self.repo.full_name.replace("/", "-")
                 )
                 repo_path = os.path.join(repo_path, str(uuid.uuid4()))
-                logging.info(f"Cloning {self.repo.full_name} - {self.repo.clone_url}")
+                logger.info(f"Cloning {self.repo.full_name} - {self.repo.clone_url}")
                 self.repo_clone: pygit2.Repository = clone_repo(
                     self.repo.clone_url, repo_path
                 )
@@ -323,7 +326,7 @@ class PatchCollector:
                     self.repo_clone, commit, previous_commit
                 )
                 if len(bug_patch) == 0 and len(non_code_patch) == 0:
-                    logging.info(
+                    logger.info(
                         f"Skipping commit {self.repo.full_name} {str(commit.id)}: no bug patch"
                     )
                     continue

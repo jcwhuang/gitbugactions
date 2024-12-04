@@ -53,7 +53,7 @@ class ActCacheDirManager:
 
         try:
             if len(cls.__ACT_CACHE_DIRS) == 0:
-                logging.warning(
+                logger.warning(
                     f"Using a default act cache dir. If running multiple threads you must use different act caches for each thread."
                 )
                 return cls.__DEFAULT_CACHE_DIR
@@ -63,7 +63,7 @@ class ActCacheDirManager:
                     cls.__ACT_CACHE_DIRS[cache_dir] = False
                     return cache_dir
 
-            logging.warning(f"No act cache dir is available. Using a random one...")
+            logger.warning(f"No act cache dir is available. Using a random one...")
 
             return os.path.join(tempfile.gettempdir(), "act-cache", str(uuid.uuid4()))
         finally:
@@ -272,6 +272,7 @@ class Act:
 
     @staticmethod
     def __setup_image(runner_image: str):
+        logger.info("Setting up image")
         with Act.__SETUP_LOCK:
             client = DockerClient.getInstance()
             if Act.__IMAGE_SETUP:
@@ -289,7 +290,8 @@ class Act:
 
             with open("Dockerfile", "w") as f:
                 client = DockerClient.getInstance()
-                dockerfile = "FROM catthehacker/ubuntu:full-latest\n"
+                # dockerfile = "FROM catthehacker/ubuntu:full-latest\n"
+                dockerfile = "FROM catthehacker/ubuntu:act-latest\n"
                 dockerfile += f"RUN sudo usermod -u 4000000 runneradmin\n"
                 dockerfile += f"RUN sudo groupadd -o -g {os.getgid()} {grp.getgrgid(os.getgid()).gr_name}\n"
                 dockerfile += f"RUN sudo usermod -G {os.getgid()} runner\n"
@@ -315,7 +317,7 @@ class Act:
         command += f" -W {workflow.path}"
 
         start_time = time.time()
-        logging.info(f"Running command: {command}")
+        logger.info(f"Running command: {command}")
         run = subprocess.run(command, shell=True, capture_output=True, text=True)
         end_time = time.time()
 
@@ -343,7 +345,7 @@ class Act:
 
         if self.fail_strategy.failed(tests_run):
             tests_run.failed = True
-            logging.warning(f"RETURN CODE: {run.returncode}")
+            logger.warning(f"RETURN CODE: {run.returncode}")
 
         updated_tokens = set()
         if GithubToken.has_tokens():
@@ -451,6 +453,7 @@ class GitHubActions:
         act_fail_strategy: ActFailureStrategy = ActTestsFailureStrategy(),
         timeout: int = 10,
     ) -> ActTestsRun:
+        logger.info("Setting up act")
         act = Act(
             self.keep_containers,
             timeout=timeout,
@@ -458,6 +461,7 @@ class GitHubActions:
             offline=self.offline,
             fail_strategy=act_fail_strategy,
         )
+        logger.info("Done setting up act, running")
         return act.run_act(self.repo_path, workflow, act_cache_dir=act_cache_dir)
 
     def remove_containers(self):
