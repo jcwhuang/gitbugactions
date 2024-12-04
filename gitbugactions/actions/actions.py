@@ -13,6 +13,9 @@ from gitbugactions.actions.workflow import GitHubWorkflow, GitHubWorkflowFactory
 from gitbugactions.github_api import GithubToken
 from gitbugactions.actions.action import Action
 from gitbugactions.docker.client import DockerClient
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class ActCacheDirManager:
@@ -297,9 +300,11 @@ class Act:
                 dockerfile += f"RUN sudo usermod -o -u {os.getuid()} runner\n"
                 f.write(dockerfile)
 
+            logger.info("Building image")
             client.images.build(path="./", tag="gitbugactions", forcerm=True)
             os.remove("Dockerfile")
             Act.__IMAGE_SETUP = True
+            logger.info("Done setting up image")
 
     @staticmethod
     def set_memory_limit(limit: str):
