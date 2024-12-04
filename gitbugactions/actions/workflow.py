@@ -64,7 +64,9 @@ class GitHubWorkflow(ABC):
                 for _, job in self.doc["jobs"].items():
                     if "steps" in job and isinstance(job["steps"], list):
                         for step in job["steps"]:
-                            if "run" in step and self._is_test_command(step["run"]):
+                            if "run" in step and self._is_test_command(
+                                str(step["run"])
+                            ):
                                 return True
             return False
         except yaml.YAMLError:
@@ -340,6 +342,9 @@ from gitbugactions.actions.java.gradle_workflow import GradleWorkflow
 from gitbugactions.actions.python.pytest_workflow import PytestWorkflow
 from gitbugactions.actions.python.unittest_workflow import UnittestWorkflow
 from gitbugactions.actions.go.go_workflow import GoWorkflow
+from gitbugactions.actions.rust.cargo_workflow import CargoWorkflow
+from gitbugactions.actions.typescript.npm_workflow import NpmWorkflow
+from gitbugactions.actions.typescript.yarn_workflow import YarnWorkflow
 
 
 class GitHubWorkflowFactory:
@@ -360,6 +365,8 @@ class GitHubWorkflowFactory:
                 "pytest": PytestWorkflow.BUILD_TOOL_KEYWORDS,
                 "unittest": UnittestWorkflow.BUILD_TOOL_KEYWORDS,
                 "go": GoWorkflow.BUILD_TOOL_KEYWORDS,
+                "npm": NpmWorkflow.BUILD_TOOL_KEYWORDS,
+                "yarn": YarnWorkflow.BUILD_TOOL_KEYWORDS,
             }
             aggregate_keywords = {kw for _ in build_tool_keywords.values() for kw in _}
             keyword_counts = {keyword: 0 for keyword in aggregate_keywords}
@@ -430,5 +437,11 @@ class GitHubWorkflowFactory:
                 return UnittestWorkflow(path, content)
             case ("go", "go"):
                 return GoWorkflow(path, content)
+            case ("rust", "cargo"):
+                return CargoWorkflow(path, content)
+            case ("typescript", "npm"):
+                return NpmWorkflow(path, content)
+            case ("typescript", "yarn"):
+                return YarnWorkflow(path, content)
             case (_, _):
                 return UnknownWorkflow(path, content)

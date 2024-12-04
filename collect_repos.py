@@ -6,7 +6,7 @@ import fire
 import datetime
 from github import Repository
 from pathlib import Path
-from gitbugactions.util import delete_repo_clone, clone_repo
+from gitbugactions.util import delete_repo_clone, clone_repo, checkout_commit
 from gitbugactions.crawler import RepoStrategy, RepoCrawler
 from gitbugactions.actions.actions import (
     GitHubActions,
@@ -30,7 +30,7 @@ class CollectReposStrategy(RepoStrategy):
         with open(data_path, "w") as f:
             json.dump(data, f, indent=4)
 
-    def handle_repo(self, repo: Repository):
+    def handle_repo(self, repo: Repository, commit: str):
         logging.info(f"Cloning {repo.full_name} - {repo.clone_url}")
         repo_path = os.path.join(
             tempfile.gettempdir(), self.uuid, repo.full_name.replace("/", "-")
@@ -50,6 +50,8 @@ class CollectReposStrategy(RepoStrategy):
         }
 
         repo_clone = clone_repo(repo.clone_url, repo_path)
+        logging.info(f"Checkout out at commit: {commit}")
+        repo_clone = checkout_commit(repo_clone, commit)
 
         try:
             data["clone_success"] = True
