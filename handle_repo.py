@@ -3,7 +3,7 @@ import fire
 import json
 import os
 import sys
-from collect_repos import CollectReposStrategy
+from collect_repos import HandleReposStrategy
 
 
 @dataclass
@@ -18,7 +18,7 @@ class MyRepository:
 
 def handle_repos(prdata_filename: str, out_path: str = "./out/"):
     os.makedirs(out_path)
-    strategy = CollectReposStrategy(out_path)
+    strategy = HandleReposStrategy(out_path)
     with open(prdata_filename) as f:
         prdata = json.load(f)
     repo = MyRepository(
