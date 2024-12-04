@@ -324,9 +324,6 @@ class Act:
 
         start_time = time.time()
         logger.info(f"Running command: {command}")
-        # run = subprocess.run(command, shell=True, capture_output=True)
-        # stdout = run.stdout.decode("utf-8")
-        # stderr = run.stderr.decode("utf-8")
         stdout = []
         stderr = []
         with subprocess.Popen(
@@ -337,10 +334,10 @@ class Act:
             text=True,
         ) as run:
             for line in run.stdout:
-                print(f"STDOUT: {line}", end="")
+                logger.info(f"STDOUT: {line}", end="")
                 stdout.append(line)
             for line in run.stderr:
-                print(f"STDERR: {line}", end="")
+                logger.error(f"STDERR: {line}", end="")
                 stderr.append(line)
         stdout = "\n".join(stdout)
         stderr = "\n".join(stderr)

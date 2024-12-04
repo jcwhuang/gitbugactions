@@ -48,7 +48,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
         self.data_path = data_path
         self.uuid = str(uuid.uuid1())
 
-    def save_data(self, data: dict, repo):
+    def save_data(self, data: dict, repo: MinimalRepository):
         """
         Saves the data json to a file with the name of the repository
         """
@@ -120,7 +120,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             else:
                 logger.info("No test workflows")
             delete_repo_clone(repo_clone)
-            self.save_data(data, pr)
+            self.save_data(data, pr.repo)
 
         except Exception as e:
             logger.error(
@@ -128,4 +128,4 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             )
 
             delete_repo_clone(repo_clone)
-            self.save_data(data, pr)
+            self.save_data(data, pr.repo)
