@@ -25,8 +25,8 @@ class CollectReposStrategy(RepoStrategy):
         """
         Saves the data json to a file with the name of the repository
         """
-        repo_name = repo.full_name.replace("/", "-")
-        data_path = os.path.join(self.data_path, repo_name + ".json")
+        repo_name = repo.full_name.replace("/", "__")
+        data_path = os.path.join(self.data_path, f"{repo_name}-{repo.pull_number}.json")
         with open(data_path, "w") as f:
             json.dump(data, f, indent=4)
 

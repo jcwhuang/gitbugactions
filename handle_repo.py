@@ -27,6 +27,7 @@ def handle_repos(
         stargazers_count=prdata["head"]["repo"]["stargazers_count"],
         language=prdata["head"]["repo"]["language"],
         size=prdata["head"]["repo"]["size"],
+        pull_number=prdata["number"]
     )
     strategy.handle_repo(repo, prdata["base"]["sha"])
 
