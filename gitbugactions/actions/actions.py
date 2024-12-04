@@ -156,6 +156,8 @@ class ActTestsRun:
         for k, v in self.__dict__.items():
             if k == "tests":
                 res[k] = []
+                if not self.tests:
+                    continue
                 for test in self.tests:
                     results = []
                     for result in test.result:
@@ -334,10 +336,10 @@ class Act:
             text=True,
         ) as run:
             for line in run.stdout:
-                logger.info(f"STDOUT: {line}")
+                print(f"STDOUT: {line}", end="")
                 stdout.append(line)
             for line in run.stderr:
-                logger.error(f"STDERR: {line}")
+                print(f"STDERR: {line}", end="")
                 stderr.append(line)
         stdout = "\n".join(stdout)
         stderr = "\n".join(stderr)
