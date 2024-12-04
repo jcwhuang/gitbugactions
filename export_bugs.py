@@ -5,7 +5,6 @@ import fire
 import uuid
 import json
 import tqdm
-import logging
 import threading
 import tempfile
 import traceback
@@ -39,7 +38,7 @@ def create_exported_containers(
         filters = {"name": f"act-{run.workflow_name}"}
         containers: List[Container] = docker_client.containers.list(filters=filters)
         if run.failed:
-            logging.error(
+            logger.error(
                 f"Run failed while exporting container {export_commit} from {repo_full_name}@{commit_hash} ({run.workflow_name}).\n"
                 "Run stdout:\n"
                 f"{run.stdout}\n\n"

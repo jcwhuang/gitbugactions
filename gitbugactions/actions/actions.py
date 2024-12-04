@@ -2,7 +2,6 @@ import os, tempfile, shutil, traceback
 import grp
 import uuid
 import time
-import logging
 import subprocess
 import threading
 
@@ -108,7 +107,7 @@ class ActCacheDirManager:
             for cache_dir in cls.__ACT_CACHE_DIRS:
                 os.symlink(action_dir, os.path.join(cache_dir, "act", action_dir_name))
         except Exception:
-            logging.error(
+            logger.error(
                 f"Error while caching action {action.declaration}: {traceback.format_exc()}"
             )
 
@@ -266,7 +265,7 @@ class Act:
             f"{Act.__ACT_PATH} --help", shell=True, capture_output=True
         )
         if run.returncode != 0:
-            logging.error("Act is not correctly installed")
+            logger.error("Act is not correctly installed")
             exit(-1)
         Act.__ACT_CHECK = True
 
@@ -281,7 +280,7 @@ class Act:
                 Act.__IMAGE_SETUP = True
                 return
             elif runner_image != Act.__DEFAULT_IMAGE:
-                logging.error(f"Base image {runner_image} does not exist")
+                logger.error(f"Base image {runner_image} does not exist")
                 exit(-1)
 
             # Creates crawler image

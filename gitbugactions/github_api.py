@@ -1,7 +1,6 @@
 import os
 import time
 import threading
-import logging
 
 from typing import List
 from github import Github, RateLimitExceededException
@@ -127,7 +126,7 @@ class GithubToken:
             for token in tokens:
                 GithubToken(token)
         else:
-            logging.error("No environment variable GITHUB_ACCESS_TOKEN provided.")
+            logger.error("No environment variable GITHUB_ACCESS_TOKEN provided.")
             exit(1)
 
     @staticmethod

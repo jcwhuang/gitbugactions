@@ -1,5 +1,4 @@
 import yaml
-import logging
 from abc import ABC, abstractmethod
 from junitparser import TestCase
 from typing import List, Set

@@ -5,13 +5,15 @@ import shutil
 import fire
 import pygit2
 import uuid
-import logging
 from typing import Dict
 from gitbugactions.test_executor import TestExecutor
 from gitbugactions.docker.export import create_diff_image
 from gitbugactions.docker.client import DockerClient
 from gitbugactions.actions.workflow import GitHubWorkflowFactory
 from gitbugactions.actions.actions import ActCacheDirManager, GitHubActions
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def get_bug_from_metadata(metadata_path, repo_name, commit):
@@ -68,7 +70,7 @@ def run_bug(
     if bug is None:
         bug = get_bug_from_metadata(metadata_path, repo_name, commit)
     if bug is None:
-        logging.error(f"{repo_name}@{commit} not found on the metadata folder.")
+        logger.error(f"{repo_name}@{commit} not found on the metadata folder.")
         exit(-1)
 
     repo_clone = pygit2.Repository(os.path.join(repo_clone_path, ".git"))

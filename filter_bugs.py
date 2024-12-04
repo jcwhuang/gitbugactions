@@ -3,7 +3,7 @@ import tempfile
 import uuid
 import pygit2
 import tqdm
-import logging, traceback
+import traceback
 import os, sys, shutil
 
 from gitbugactions.test_executor import TestExecutor
@@ -238,7 +238,7 @@ def filter_bugs(
                 commit = bug["commit_hash"]
                 status = future.result()
             except Exception:
-                logging.error(
+                logger.error(
                     f"Error testing flakiness on {repository}@{commit}: {traceback.format_exc()}"
                 )
             else:

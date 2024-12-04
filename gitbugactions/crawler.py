@@ -1,5 +1,4 @@
 import math
-import logging
 import tqdm
 import pandas as pd
 from abc import ABC, abstractmethod
@@ -100,7 +99,7 @@ class RepoCrawler:
             getattr, page_list, "totalCount"
         )
         if totalCount is None:
-            logging.error(f'Search "{query}" failed')
+            logger.error(f'Search "{query}" failed')
             return
         elif totalCount == 1000:
             logger.warning(

@@ -3,7 +3,6 @@ import uuid, json
 import shutil
 import pygit2
 import tempfile
-import logging
 import tqdm
 import threading
 import fire
@@ -530,7 +529,7 @@ def collect_bugs(
                 patch_collector = future_to_collector[future]
                 result = future.result()
             except Exception:
-                logging.error(
+                logger.error(
                     f"Error while collecting commits from {patch_collector.repo}: {traceback.format_exc()}"
                 )
             else:
@@ -568,7 +567,7 @@ def collect_bugs(
             try:
                 future.result()
             except Exception:
-                logging.error(
+                logger.error(
                     f"Error while downloading action: {traceback.format_exc()}"
                 )
                 continue
@@ -587,7 +586,7 @@ def collect_bugs(
                 patch_collector = future_to_collector[future]
                 future.result()
             except Exception:
-                logging.error(
+                logger.error(
                     f"Error while setting default github actions from {patch_collector.repo}: {traceback.format_exc()}"
                 )
                 continue
@@ -607,7 +606,7 @@ def collect_bugs(
                 bug_patch = future_to_patches[future]
                 is_patch = future.result()
             except Exception:
-                logging.error(
+                logger.error(
                     f"Error while collecting patches from {bug_patch.repo}: {traceback.format_exc()}"
                 )
             else:

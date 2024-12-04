@@ -1,5 +1,4 @@
 import os, re, xml
-import logging
 import traceback
 import yaml
 import shutil
@@ -13,6 +12,9 @@ from gitbugactions.actions.actions import ActCacheDirManager
 from gitbugactions.test_executor import TestExecutor
 from junitparser.junitparser import JUnitXmlError
 from enum import Enum
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def delete_repo_clone(repo_clone: pygit2.Repository):
@@ -36,7 +38,7 @@ def clone_repo(clone_url: str, path: str) -> pygit2.Repository:
             return repo_clone
         except pygit2.GitError as e:
             if r == retries - 1:
-                logging.error(
+                logger.error(
                     f"Error while cloning {clone_url}: {traceback.format_exc()}"
                 )
                 raise e
