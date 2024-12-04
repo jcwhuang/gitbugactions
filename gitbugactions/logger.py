@@ -20,7 +20,7 @@ def get_logger(filename: str) -> logging.Logger:
     :return: The configured logger.
     """
     logger = logging.getLogger(filename)
-    logger.setLevel(logger.info)
+    logger.setLevel(logging.INFO)
     stream_handler = logging.StreamHandler()
     logger.addHandler(stream_handler)
 
