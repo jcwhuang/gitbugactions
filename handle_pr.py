@@ -1,27 +1,16 @@
-from dataclasses import dataclass
 import fire
 import json
 import os
 import sys
-from collect_repos import HandleReposStrategy
-
-
-@dataclass
-class MyRepository:
-    full_name: str
-    clone_url: str
-    stargazers_count: int
-    language: str
-    size: str
-    pull_number: int
+from collect_prs import HandlePullRequestsStrategy, PullRequest, MinimalRepository
 
 
 def handle_repos(prdata_filename: str, out_path: str = "./out/"):
     os.makedirs(out_path)
-    strategy = HandleReposStrategy(out_path)
+    strategy = HandlePullRequestsStrategy(out_path)
     with open(prdata_filename) as f:
         prdata = json.load(f)
-    repo = MyRepository(
+    repo = MinimalRepository(
         full_name=prdata["head"]["repo"]["full_name"],
         clone_url=prdata["head"]["repo"]["clone_url"],
         stargazers_count=prdata["head"]["repo"]["stargazers_count"],
@@ -29,7 +18,10 @@ def handle_repos(prdata_filename: str, out_path: str = "./out/"):
         size=prdata["head"]["repo"]["size"],
         pull_number=prdata["number"],
     )
-    strategy.handle_repo(repo, prdata["base"]["sha"])
+    pr = PullRequest(
+        repo=repo, pull_number=prdata["number"], base_commit=prdata["base"]["sha"]
+    )
+    strategy.handle_pr(pr)
 
 
 def main():
