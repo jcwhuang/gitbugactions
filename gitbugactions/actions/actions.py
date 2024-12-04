@@ -225,7 +225,9 @@ class Act:
     __ACT_PATH = "act"
     __ACT_CHECK = False
     __IMAGE_SETUP = False
-    __FLAGS = f"--pull=false --no-cache-server --max-parallel 1"
+    __FLAGS = (
+        f"--pull=false --no-cache-server"  # error with this flag: --max-parallel 1"
+    )
     __SETUP_LOCK = threading.Lock()
     __MEMORY_LIMIT = "7g"
     __DEFAULT_IMAGE = "gitbugactions:latest"
