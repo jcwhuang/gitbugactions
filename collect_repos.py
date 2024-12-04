@@ -46,7 +46,8 @@ class CollectReposStrategy(RepoStrategy):
             "clone_success": False,
             "number_of_actions": 0,
             "number_of_test_actions": 0,
-            "actions_successful": False,
+            "actions_successful": {},
+            "actions_run": {},
         }
 
         repo_clone = clone_repo(repo.clone_url, repo_path)
@@ -68,9 +69,9 @@ class CollectReposStrategy(RepoStrategy):
             actions.save_workflows()
             num_test_workflows = len(actions.test_workflows)
             if num_test_workflows > 0:
-                logging.info(f"Running {num_test_workflows} actions for {repo.full_name}")
-                data["actions_successful"] = {}
-                data["actions_run"] = {}
+                logging.info(
+                    f"Running {num_test_workflows} actions for {repo.full_name}"
+                )
                 for i, test_workflow in enumerate(actions.test_workflows):
                     logging.info(f"Running test workflow {i}: {test_workflow.path}")
                     # Act creates names for the containers by hashing the content of the workflows
@@ -88,9 +89,11 @@ class CollectReposStrategy(RepoStrategy):
 
                     data["actions_successful"][test_workflow.path] = not act_run.failed
                     data["actions_run"][test_workflow.path] = act_run.asdict()
-
+            else:
+                logging.info("No test workflows")
             delete_repo_clone(repo_clone)
             self.save_data(data, repo)
+
         except Exception as e:
             logging.error(
                 f"Error while processing {repo.full_name}: {traceback.format_exc()}"

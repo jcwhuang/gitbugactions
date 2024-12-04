@@ -315,7 +315,8 @@ class Act:
         command += f" -W {workflow.path}"
 
         start_time = time.time()
-        run = subprocess.run(command, shell=True, capture_output=True)
+        logging.info(f"Running command: {command}")
+        run = subprocess.run(command, shell=True, capture_output=True, text=True)
         end_time = time.time()
 
         stdout = run.stdout.decode("utf-8")

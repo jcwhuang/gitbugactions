@@ -55,7 +55,9 @@ class NpmWorkflow(GitHubWorkflow):
                                 step["run"] += " --reporter mocha-junit-reporter"
 
                             if "--reporter-options" not in step["run"]:
-                                step["run"] += " --reporter-options mochaFile=report.xml"
+                                step[
+                                    "run"
+                                ] += " --reporter-options mochaFile=report.xml"
 
     def get_test_results(self, repo_path) -> List[TestCase]:
         parser = JUnitXMLParser()

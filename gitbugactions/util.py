@@ -41,13 +41,14 @@ def clone_repo(clone_url: str, path: str) -> pygit2.Repository:
                 )
                 raise e
 
+
 def checkout_commit(repo_clone: pygit2.Repository, commit: str) -> None:
     subprocess.run(
-            f"git checkout {commit}",
-            cwd=repo_clone.workdir,
-            capture_output=True,
-            shell=True,
-        )
+        f"git checkout {commit}",
+        cwd=repo_clone.workdir,
+        capture_output=True,
+        shell=True,
+    )
 
 
 def get_default_github_actions(
