@@ -97,7 +97,9 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             actions.save_workflows()
             num_test_workflows = len(actions.test_workflows)
             if num_test_workflows > 0:
-                logger.info(f"Running {num_test_workflows} actions for {pr.full_name}")
+                logger.info(
+                    f"Running {num_test_workflows} actions for {pr.repo.full_name}"
+                )
                 for i, test_workflow in enumerate(actions.test_workflows):
                     logger.info(f"Running test workflow {i}: {test_workflow.path}")
                     # Act creates names for the containers by hashing the content of the workflows
