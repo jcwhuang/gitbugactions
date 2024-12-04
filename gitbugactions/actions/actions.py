@@ -334,10 +334,10 @@ class Act:
             text=True,
         ) as run:
             for line in run.stdout:
-                logger.info(f"STDOUT: {line}", end="")
+                logger.info(f"STDOUT: {line}")
                 stdout.append(line)
             for line in run.stderr:
-                logger.error(f"STDERR: {line}", end="")
+                logger.error(f"STDERR: {line}")
                 stderr.append(line)
         stdout = "\n".join(stdout)
         stderr = "\n".join(stderr)
