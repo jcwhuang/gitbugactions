@@ -17,5 +17,4 @@ class DockerClient:
         if DockerClient.__instance != None:
             raise Exception("This class is a singleton!")
         else:
-            DockerClient.__instance = docker.DockerClient(base_url='unix://var/run/docker.sock', timeout=1200)
-            # DockerClient.__instance = docker.from_env(timeout=1200)
+            DockerClient.__instance = docker.from_env(timeout=1200)
