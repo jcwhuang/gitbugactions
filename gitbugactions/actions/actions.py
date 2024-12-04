@@ -322,11 +322,27 @@ class Act:
 
         start_time = time.time()
         logger.info(f"Running command: {command}")
-        run = subprocess.run(command, shell=True, capture_output=True, text=True)
+        # run = subprocess.run(command, shell=True, capture_output=True)
+        # stdout = run.stdout.decode("utf-8")
+        # stderr = run.stderr.decode("utf-8")
+        stdout = []
+        stderr = []
+        with subprocess.Popen(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        ) as run:
+            for line in run.stdout:
+                print(f"STDOUT: {line}", end="")
+                stdout.append(line)
+            for line in run.stderr:
+                print(f"STDERR: {line}", end="")
+                stderr.append(line)
+        stdout = "\n".join(stdout)
+        stderr = "\n".join(stderr)
         end_time = time.time()
-
-        stdout = run.stdout.decode("utf-8")
-        stderr = run.stderr.decode("utf-8")
 
         tests = workflow.get_test_results(
             os.path.join(
