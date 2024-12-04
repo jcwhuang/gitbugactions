@@ -295,7 +295,7 @@ class Act:
             with open("Dockerfile", "w") as f:
                 client = DockerClient.getInstance()
                 # dockerfile = "FROM catthehacker/ubuntu:full-latest\n"
-                dockerfile = "FROM catthehacker/ubuntu:act-latest\n"
+                dockerfile = "FROM catthehacker/ubuntu:js-latest\n"
                 # dockerfile += f"RUN sudo usermod -u 4000000 runneradmin\n"
                 # dockerfile += f"RUN sudo groupadd -o -g {os.getgid()} {grp.getgrgid(os.getgid()).gr_name}\n"
                 # dockerfile += f"RUN sudo usermod -G {os.getgid()} runner\n"
