@@ -3,8 +3,8 @@ from junitparser import TestCase
 from pathlib import Path
 import re
 
-from code_data_utils.gitbugactions.actions.workflow import GitHubWorkflow
-from code_data_utils.gitbugactions.actions.multi.junitxmlparser import JUnitXMLParser
+from gitbugactions.actions.workflow import GitHubWorkflow
+from gitbugactions.actions.multi.junitxmlparser import JUnitXMLParser
 
 
 class YarnWorkflow(GitHubWorkflow):
