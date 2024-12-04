@@ -45,8 +45,12 @@ def clone_repo(clone_url: str, path: str) -> pygit2.Repository:
 
 
 def checkout_commit(repo_clone: pygit2.Repository, commit: str) -> None:
+    """Create a temporary branch pointing at the commit.
+    This avoids the following error while running act:
+        git ref: failed to identify reference (tag/branch) for the checked-out revision
+    """
     subprocess.run(
-        f"git checkout {commit}",
+        f"git checkout -b temp-branch {commit}",
         cwd=repo_clone.workdir,
         capture_output=True,
         shell=True,

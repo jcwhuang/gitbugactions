@@ -25,39 +25,10 @@ class YarnWorkflow(GitHubWorkflow):
         return False, ""
 
     def instrument_online_execution(self):
-        if self.has_tests():
-            for _, job in self.doc["jobs"].items():
-                if "steps" in job:
-                    for step in job["steps"]:
-                        if "run" in step and self._is_test_command(step["run"]):
-                            break
-                    else:
-                        continue
-
-                    job["steps"].insert(
-                        0,
-                        {
-                            "name": "gitbug-actions install mocha-junit-reporter",
-                            "run": "yarn add mocha-junit-reporter --dev",
-                        },
-                    )
-                    return
+        pass
 
     def instrument_test_steps(self):
-        if "jobs" in self.doc:
-            for _, job in self.doc["jobs"].items():
-                if "steps" in job["steps"]:
-                    for step in job["steps"]:
-                        if "run" in step and self._is_test_command(step["run"]):
-                            step["run"] = step["run"].strip()
-
-                            if "--reporter mocha-junit-reporter" not in step["run"]:
-                                step["run"] += " --reporter mocha-junit-reporter"
-
-                            if "--reporter-options" not in step["run"]:
-                                step[
-                                    "run"
-                                ] += " --reporter-options mochaFile=report.xml"
+        pass
 
     def get_test_results(self, repo_path) -> List[TestCase]:
         parser = JUnitXMLParser()
