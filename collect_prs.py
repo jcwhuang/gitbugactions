@@ -56,7 +56,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
         repo_name = repo.full_name.replace("/", "__")
         data_path = os.path.join(self.data_path, f"{repo_name}-{repo.pull_number}.json")
         with open(data_path, "w") as f:
-            json.dump(data, f, indent=4)
+            json.dump(data, f)
 
     def handle_pr(self, pr: PullRequest):
         logger.info(f"Cloning {pr.repo.full_name} - {pr.repo.clone_url}")
