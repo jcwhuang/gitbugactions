@@ -5,7 +5,7 @@ import sys
 from collect_prs import HandlePullRequestsStrategy, PullRequest, MinimalRepository
 
 
-def handle_repos(prdata_filename: str, out_path: str = "./out/"):
+def handle_repos(prdata_filename: str, out_path: str = "../out/"):
     os.makedirs(out_path)
     strategy = HandlePullRequestsStrategy(out_path)
     with open(prdata_filename) as f:
