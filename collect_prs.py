@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 
 import tempfile
 import os, traceback
@@ -70,6 +71,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             "size": pr.repo.size,
             "clone_url": pr.repo.clone_url,
             "pull_number": pr.pull_number,
+            "base_commit": pr.base_commit,
             "timestamp": datetime.datetime.now(datetime.UTC).isoformat() + "Z",
             "clone_success": False,
             "number_of_actions": 0,
@@ -101,7 +103,10 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                     f"Running {num_test_workflows} actions for {pr.repo.full_name}"
                 )
                 for i, test_workflow in enumerate(actions.test_workflows):
-                    logger.info(f"Running test workflow {i}: {test_workflow.path}")
+                    relative_workflow_path = Path(test_workflow.path).relative_to(
+                        repo_path
+                    )
+                    logger.info(f"Running test workflow {i}: {relative_workflow_path}")
                     # Act creates names for the containers by hashing the content of the workflows
                     # To avoid conflicts between threads, we randomize the name
                     actions.test_workflows[i].doc["name"] = str(uuid.uuid4())
@@ -117,8 +122,10 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                     finally:
                         ActCacheDirManager.return_act_cache_dir(act_cache_dir)
 
-                    data["actions_successful"][test_workflow.path] = not act_run.failed
-                    data["actions_run"][test_workflow.path] = act_run.asdict()
+                    data["actions_successful"][
+                        relative_workflow_path
+                    ] = not act_run.failed
+                    data["actions_run"][relative_workflow_path] = act_run.asdict()
             else:
                 logger.info("No test workflows")
             delete_repo_clone(repo_clone)
