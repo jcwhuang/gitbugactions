@@ -103,8 +103,8 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                     f"Running {num_test_workflows} actions for {pr.repo.full_name}"
                 )
                 for i, test_workflow in enumerate(actions.test_workflows):
-                    relative_workflow_path = Path(test_workflow.path).relative_to(
-                        repo_path
+                    relative_workflow_path = str(
+                        Path(test_workflow.path).relative_to(repo_path)
                     )
                     logger.info(f"Running test workflow {i}: {relative_workflow_path}")
                     # Act creates names for the containers by hashing the content of the workflows
