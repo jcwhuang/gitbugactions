@@ -95,14 +95,14 @@ class NpmWorkflow(GitHubWorkflow):
                         0,
                         {
                             "name": "gitbug-actions List files in the directory",
-                            "run": "ls -alh",  # -a for all files, -l for detailed listing, -h for human-readable sizes
+                            "run": f"ls -alh {self.repo_path}",  # -a for all files, -l for detailed listing, -h for human-readable sizes
                         },
                     )
                     job["steps"].insert(
                         1,
                         {
                             "name": "gitbug-actions Install dependencies",
-                            "run": "npm install",
+                            "run": f"cd {self.repo_path} && npm install",
                         },
                     )
                     return
