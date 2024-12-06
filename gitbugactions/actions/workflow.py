@@ -27,7 +27,7 @@ class GitHubWorkflow(ABC):
         "ubuntu-18.04",
     ]
 
-    def __init__(self, path: str, workflow: str = ""):
+    def __init__(self, path: str, repo_path: str, workflow: str = ""):
         try:
             if workflow == "":
                 with open(path, "r") as stream:
@@ -41,6 +41,7 @@ class GitHubWorkflow(ABC):
         except Exception:
             self.doc = []
         self.path = path
+        self.repo_path = repo_path
         self.tokens: List[GithubToken] = []
 
     @abstractmethod
@@ -421,7 +422,9 @@ class GitHubWorkflowFactory:
             return None
 
     @staticmethod
-    def create_workflow(path: str, language: str, content: str = "") -> GitHubWorkflow:
+    def create_workflow(
+        path: str, language: str, repo_path: str, content: str = ""
+    ) -> GitHubWorkflow:
         """
         Creates a workflow object according to the language and build system.
         """
@@ -429,20 +432,20 @@ class GitHubWorkflowFactory:
 
         match (language, build_tool):
             case ("java", "maven"):
-                return MavenWorkflow(path, content)
+                return MavenWorkflow(path, repo_path=repo_path, workflow=content)
             case ("java", "gradle"):
-                return GradleWorkflow(path, content)
+                return GradleWorkflow(path, repo_path=repo_path, workflow=content)
             case ("python", "pytest"):
-                return PytestWorkflow(path, content)
+                return PytestWorkflow(path, repo_path=repo_path, workflow=content)
             case ("python", "unittest"):
-                return UnittestWorkflow(path, content)
+                return UnittestWorkflow(path, repo_path=repo_path, workflow=content)
             case ("go", "go"):
-                return GoWorkflow(path, content)
+                return GoWorkflow(path, repo_path=repo_path, workflow=content)
             case ("rust", "cargo"):
-                return CargoWorkflow(path, content)
+                return CargoWorkflow(path, repo_path=repo_path, workflow=content)
             case ("typescript", "npm"):
-                return NpmWorkflow(path, content)
+                return NpmWorkflow(path, repo_path=repo_path, workflow=content)
             case ("typescript", "yarn"):
-                return YarnWorkflow(path, content)
+                return YarnWorkflow(path, repo_path=repo_path, workflow=content)
             case (_, _):
-                return UnknownWorkflow(path, content)
+                return UnknownWorkflow(path, repo_path=repo_path, workflow=content)

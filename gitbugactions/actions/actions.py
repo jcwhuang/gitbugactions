@@ -414,7 +414,7 @@ class GitHubActions:
             for file in yaml_files:
                 # Create workflow object according to the language and build system
                 workflow: GitHubWorkflow = GitHubWorkflowFactory.create_workflow(
-                    os.path.join(dirpath, file), self.language
+                    os.path.join(dirpath, file), self.language, repo_path=repo_path
                 )
 
                 self.workflows.append(workflow)
