@@ -90,12 +90,26 @@ class NpmWorkflow(GitHubWorkflow):
                         )
                         return
 
-                    # Insert a pnpm install step to install all dependencies
+                    # Insert a npm install step to install all dependencies
+                    job["steps"].insert(
+                        0,
+                        {
+                            "name": "gitbug-actions List files in the directory",
+                            "run": "ls -alh",  # -a for all files, -l for detailed listing, -h for human-readable sizes
+                        },
+                    )
                     job["steps"].insert(
                         0,
                         {
                             "name": "gitbug-actions Install dependencies",
                             "run": "npm install",
+                        },
+                    )
+                    job["steps"].insert(
+                        1,
+                        {
+                            "name": "List files in the directory",
+                            "run": "ls -alh",  # -a for all files, -l for detailed listing, -h for human-readable sizes
                         },
                     )
                     return
