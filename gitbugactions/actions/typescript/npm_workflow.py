@@ -59,7 +59,7 @@ class NpmWorkflow(GitHubWorkflow):
                             0,
                             {
                                 "name": "gitbug-actions Install jest-junit",
-                                "run": "npm add jest-junit --dev",
+                                "run": "npm add jest-junit",
                             },
                         )
                     elif "mocha" in test_cmd:
@@ -70,7 +70,7 @@ class NpmWorkflow(GitHubWorkflow):
                             0,
                             {
                                 "name": "gitbug-actions Install mocha-junit-reporter",
-                                "run": "npm add mocha-junit-reporter --dev",
+                                "run": "npm add mocha-junit-reporter",
                             },
                         )
                     elif "vite" in test_cmd or "vitest" in test_cmd:
@@ -81,7 +81,7 @@ class NpmWorkflow(GitHubWorkflow):
                             0,
                             {
                                 "name": "gitbug-actions Install vite-plugin-junit-reporter",
-                                "run": "npm add vite-plugin-junit-reporter --dev",
+                                "run": "npm add vite-plugin-junit-reporter",
                             },
                         )
                     else:
