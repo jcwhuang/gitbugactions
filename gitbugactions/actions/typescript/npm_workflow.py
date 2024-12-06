@@ -15,7 +15,7 @@ class NpmWorkflow(GitHubWorkflow):
     REPORT_LOCATION = "report.xml"
 
     def _is_test_command(self, command) -> bool:
-        return self.__is_command(command, ["test"])[0]
+        return self.__is_command(command, ["test", "run test"])[0]
 
     def __is_command(self, command: str, keywords: List[str]) -> Tuple[bool, str]:
         for keyword in keywords:
