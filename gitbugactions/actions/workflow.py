@@ -378,7 +378,7 @@ class GitHubWorkflowFactory:
                 if isinstance(phrase, str):
                     for name in phrase.strip().lower().split(" "):
                         for keyword in aggregate_keywords:
-                            if keyword in name:
+                            if keyword == name:
                                 keyword_counts[keyword] += 1
 
             # Load the workflow
