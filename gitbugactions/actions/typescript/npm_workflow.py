@@ -124,10 +124,11 @@ class NpmWorkflow(GitHubWorkflow):
                                 return
 
                             # Extract the test command from the "scripts" section
-                            original_test_command = package_json.get("scripts", {}).get(
+                            test_command = package_json.get("scripts", {}).get(
                                 "test", ""
                             )
-                            test_command = original_test_command
+                            logger.info(f"Original test command: {test_command}")
+                            npm_test_command = step["run"]
 
                             if test_command:
                                 # Update the test command to output junitxml results
@@ -169,9 +170,13 @@ class NpmWorkflow(GitHubWorkflow):
                                         )
 
                                 # Update the step with the modified test command directly
-                                step["run"] = step["run"].replace(
-                                    original_test_command, test_command
-                                )
+                                # step["run"] = step["run"].replace(
+                                #     npm_test_command, test_command
+                                # )
+                                # Update package.json with the modified test command
+                                package_json["scripts"]["test"] = test_command
+                                with open(package_json_path, "w") as f:
+                                    package_json = json.dump(package_json, f)
                             else:
                                 print("No test command found in package.json.")
 
