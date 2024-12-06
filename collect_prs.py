@@ -45,8 +45,9 @@ class PullRequestStrategy(ABC):
 
 
 class HandlePullRequestsStrategy(PullRequestStrategy):
-    def __init__(self, data_path: str):
+    def __init__(self, data_path: str, base_image: str):
         self.data_path = data_path
+        self.base_image = base_image
         self.uuid = str(uuid.uuid1())
 
     def save_data(self, data: dict, repo: MinimalRepository):
@@ -87,7 +88,9 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
         try:
             data["clone_success"] = True
 
-            actions = GitHubActions(repo_path, pr.repo.language)
+            actions = GitHubActions(
+                repo_path, pr.repo.language, base_image=self.base_image
+            )
             data["number_of_actions"] = len(actions.workflows)
             data["actions_build_tools"] = [
                 x.get_build_tool() for x in actions.workflows

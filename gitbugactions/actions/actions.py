@@ -239,6 +239,7 @@ class Act:
         reuse: bool = False,
         timeout=5,
         runner_image: str = __DEFAULT_IMAGE,
+        base_image: str = "ubuntu:act-latest",
         offline: bool = False,
         fail_strategy: ActFailureStrategy = ActTestsFailureStrategy(),
     ):
@@ -247,7 +248,7 @@ class Act:
             timeout (int): Timeout in minutes
         """
         Act.__check_act()
-        Act.__setup_image(runner_image)
+        Act.__setup_image(runner_image, base_image)
         if reuse:
             self.flags = "--reuse"
         else:
@@ -277,7 +278,7 @@ class Act:
         Act.__ACT_CHECK = True
 
     @staticmethod
-    def __setup_image(runner_image: str):
+    def __setup_image(runner_image: str, base_image: str = "ubuntu:act-latest"):
         logger.info("Setting up image")
         with Act.__SETUP_LOCK:
             client = DockerClient.getInstance()
@@ -297,7 +298,7 @@ class Act:
             with open("Dockerfile", "w") as f:
                 client = DockerClient.getInstance()
                 # dockerfile = "FROM catthehacker/ubuntu:full-latest\n"
-                dockerfile = "FROM catthehacker/ubuntu:js-latest\n"
+                dockerfile = f"FROM catthehacker/{base_image}\n"
                 # dockerfile += f"RUN sudo usermod -u 4000000 runneradmin\n"
                 # dockerfile += f"RUN sudo groupadd -o -g {os.getgid()} {grp.getgrgid(os.getgid()).gr_name}\n"
                 # dockerfile += f"RUN sudo usermod -G {os.getgid()} runner\n"
@@ -390,6 +391,7 @@ class GitHubActions:
         language: str | None,
         keep_containers: bool = False,
         runner_image: str = "gitbugactions:latest",
+        base_image: str = "ubuntu:act-latest",
         offline: bool = False,
     ):
         self.repo_path = repo_path
@@ -398,6 +400,7 @@ class GitHubActions:
         self.workflows: List[GitHubWorkflow] = []
         self.test_workflows: List[GitHubWorkflow] = []
         self.runner_image = runner_image
+        self.base_image = base_image
         self.offline = offline
 
         workflows_path = os.path.join(repo_path, ".github", "workflows")
@@ -479,6 +482,7 @@ class GitHubActions:
             self.keep_containers,
             timeout=timeout,
             runner_image=self.runner_image,
+            base_image=self.base_image,
             offline=self.offline,
             fail_strategy=act_fail_strategy,
         )
