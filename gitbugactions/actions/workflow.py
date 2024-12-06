@@ -367,6 +367,7 @@ class GitHubWorkflowFactory:
                 "go": GoWorkflow.BUILD_TOOL_KEYWORDS,
                 "npm": NpmWorkflow.BUILD_TOOL_KEYWORDS,
                 "yarn": YarnWorkflow.BUILD_TOOL_KEYWORDS,
+                "cargo": CargoWorkflow.BUILD_TOOL_KEYWORDS,
             }
             aggregate_keywords = {kw for _ in build_tool_keywords.values() for kw in _}
             keyword_counts = {keyword: 0 for keyword in aggregate_keywords}
