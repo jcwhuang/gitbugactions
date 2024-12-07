@@ -3,6 +3,10 @@ from junitparser import JUnitXml, TestCase, TestSuite
 from typing import List, Union
 from pathlib import Path
 
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 class JUnitXMLParser(TestParser):
     def __get_test_results_xml(
@@ -33,5 +37,7 @@ class JUnitXMLParser(TestParser):
             if xml is not None:
                 # Start the recursive function on the root element
                 tests.extend(self.__get_test_results_xml(xml))
+            else:
+                logger.warning(f"xml is none for file {file}")
 
         return tests
