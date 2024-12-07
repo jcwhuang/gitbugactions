@@ -186,7 +186,7 @@ class NpmWorkflow(GitHubWorkflow):
         logger.info(f"Looking for test results at {repo_path}")
         run = subprocess.run(f"ls {repo_path}", shell=True, capture_output=True)
         logger.info(f"Results of ls {repo_path}: {run.stdout}")
-        return parser.get_test_results(str(Path(repo_path, "report.xml")))
+        return parser.get_test_results(str(Path(repo_path, "junit.xml")))
 
     def get_build_tool(self) -> str:
         return "npm"
