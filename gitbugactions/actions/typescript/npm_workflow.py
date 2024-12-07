@@ -43,7 +43,7 @@ class NpmWorkflow(GitHubWorkflow):
 
             for _, job in self.doc["jobs"].items():
                 if "steps" in job:
-                    for step in job["steps"]:
+                    for i, step in enumerate(job["steps"]):
                         if "run" in step and self._is_test_command(step["run"]):
                             break
                     else:
@@ -56,7 +56,7 @@ class NpmWorkflow(GitHubWorkflow):
                             "Jest detected, adding jest-junit installation step..."
                         )
                         job["steps"].insert(
-                            0,
+                            i,
                             {
                                 "name": "gitbug-actions Install jest-junit",
                                 "run": "npm add jest-junit",
@@ -67,7 +67,7 @@ class NpmWorkflow(GitHubWorkflow):
                             "Mocha detected, adding mocha-junit-reporter installation step..."
                         )
                         job["steps"].insert(
-                            0,
+                            i,
                             {
                                 "name": "gitbug-actions Install mocha-junit-reporter",
                                 "run": "npm add mocha-junit-reporter",
@@ -78,7 +78,7 @@ class NpmWorkflow(GitHubWorkflow):
                             "Vitest detected, adding vite-plugin-junit-reporter installation step..."
                         )
                         logger.info["steps"].insert(
-                            0,
+                            i,
                             {
                                 "name": "gitbug-actions Install vite-plugin-junit-reporter",
                                 "run": "npm add vite-plugin-junit-reporter",
@@ -92,17 +92,17 @@ class NpmWorkflow(GitHubWorkflow):
 
                     # Insert a npm install step to install all dependencies
                     job["steps"].insert(
-                        1,
+                        i + 1,
                         {
                             "name": "gitbug-actions List files in the directory",
-                            "run": f"ls -alh {self.repo_path}",  # -a for all files, -l for detailed listing, -h for human-readable sizes
+                            "run": f"ls -alh",  # -a for all files, -l for detailed listing, -h for human-readable sizes
                         },
                     )
                     job["steps"].insert(
-                        2,
+                        i + 1,
                         {
                             "name": "gitbug-actions Install dependencies",
-                            "run": f"cd {self.repo_path} && npm install",
+                            "run": f"npm install",
                         },
                     )
                     return
