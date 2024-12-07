@@ -227,9 +227,7 @@ class Act:
     __ACT_PATH = "act"
     __ACT_CHECK = False
     __IMAGE_SETUP = False
-    __FLAGS = (
-        f"--pull=false --no-cache-server"  # error with this flag: --max-parallel 1"
-    )
+    __FLAGS = f"--pull=false --no-cache-server --bind"  # error with this flag: --max-parallel 1"
     __SETUP_LOCK = threading.Lock()
     __MEMORY_LIMIT = "7g"
     __DEFAULT_IMAGE = "gitbugactions:latest"
@@ -351,6 +349,9 @@ class Act:
                 repo_path, ".act-result", os.path.basename(os.path.normpath(repo_path))
             )
         )
+        if len(tests) == 0:
+            logger.info("Trying again with simplified repo path")
+            tests = workflow.get_test_results(repo_path)
 
         tests_run = ActTestsRun(
             failed=False,
