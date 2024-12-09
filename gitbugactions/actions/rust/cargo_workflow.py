@@ -29,84 +29,53 @@ class CargoWorkflow(GitHubWorkflow):
         return False, ""
 
     def instrument_online_execution(self):
-        pass
-        # if self.has_tests():
-        #     for _, job in self.doc["jobs"].items():
-        #         if "steps" in job:
-        #             for step in job["steps"]:
-        #                 if "run" in step and self._is_test_command(step["run"]):
-        #                     break
-        #             else:
-        #                 continue
+        if self.has_tests():
+            for _, job in self.doc["jobs"].items():
+                if "steps" in job:
+                    for i, step in enumerate(job["steps"]):
+                        if "run" in step and self._is_test_command(step["run"]):
+                            break
+                    else:
+                        continue
 
-        #             # Job with tests
-        #             # Install cargo2junit to generate JUnit XML reports
-        #             job["steps"].insert(
-        #                 0,
-        #                 {
-        #                     "name": "Install cargo2junit",
-        #                     "run": "cargo install cargo2junit",
-        #                 },
-        #             )
-        #             # Cache dependencies to speed up builds
-        #             job["steps"].append(
-        #                 {
-        #                     "name": "Cache dependencies",
-        #                     "run": f"mkdir -p {CargoWorkflow.GITBUG_CACHE} && "
-        #                     + f"cp Cargo.lock {CargoWorkflow.GITBUG_CACHE} || : && "
-        #                     + f"cp Cargo.toml {CargoWorkflow.GITBUG_CACHE} || :",
-        #                 }
-        #             )
-        #             return
-
-    def instrument_offline_execution(self):
-        pass
-        # if self.has_tests():
-        #     for _, job in self.doc["jobs"].items():
-        #         if "steps" in job:
-        #             for step in job["steps"]:
-        #                 # Remove actions added in online execution
-        #                 if "name" in step and step["name"] in [
-        #                     "Install cargo2junit",
-        #                     "Cache dependencies",
-        #                 ]:
-        #                     job["steps"].remove(step)
-
-        #                 if "run" not in step:
-        #                     continue
-
-        #                 is_mod_command, keyword = self.__is_command(
-        #                     step["run"], ["build", "run", "test"]
-        #                 )
-        #                 if is_mod_command:
-        #                     step["run"] = f"{step['run']} --locked"
-
-        #             job["steps"].insert(
-        #                 0,
-        #                 {
-        #                     "name": "Restore dependencies",
-        #                     "run": f"cp {CargoWorkflow.GITBUG_CACHE}/Cargo.lock . || : && "
-        #                     + f"cp {CargoWorkflow.GITBUG_CACHE}/Cargo.toml . || :",
-        #                 },
-        #             )
+                    # Job with tests
+                    # Install cargo2junit to generate JUnit XML reports
+                    job["steps"].insert(
+                        i,
+                        {
+                            "name": "Install cargo2junit",
+                            "run": "cargo install cargo2junit",
+                        },
+                    )
+                    # Cache dependencies to speed up builds
+                    job["steps"].append(
+                        {
+                            "name": "Cache dependencies",
+                            "run": f"mkdir -p {CargoWorkflow.GITBUG_CACHE} && "
+                            + f"cp Cargo.lock {CargoWorkflow.GITBUG_CACHE} || : && "
+                            + f"cp Cargo.toml {CargoWorkflow.GITBUG_CACHE} || :",
+                        }
+                    )
+                    return
 
     def instrument_test_steps(self):
-        pass
-        # if "jobs" in self.doc:
-        #     for _, job in self.doc["jobs"].items():
-        #         if "steps" in job:
-        #             for step in job["steps"]:
-        #                 if "run" in step and self._is_test_command(step["run"]):
-        #                     step["run"] = step["run"].strip()
+        if "jobs" in self.doc:
+            for _, job in self.doc["jobs"].items():
+                if "steps" in job:
+                    for step in job["steps"]:
+                        if "run" in step and self._is_test_command(step["run"]):
+                            step["run"] = step["run"].strip()
 
-        #                     # Add cargo2junit for JUnit XML output
-        #                     if (
-        #                         "cargo test" in step["run"]
-        #                         and "| cargo2junit" not in step["run"]
-        #                     ):
-        #                         step["run"] = (
-        #                             step["run"] + " | cargo2junit > results.xml"
-        #                         )
+                            # Add cargo2junit for JUnit XML output
+                            if (
+                                "cargo test" in step["run"]
+                                and "| cargo2junit" not in step["run"]
+                            ):
+                                step["run"] = (
+                                    "RUSTC_BOOTSTRAP=1 "
+                                    + step["run"]
+                                    + " | cargo2junit > results.xml"
+                                )
 
     def get_test_results(self, repo_path) -> List[TestCase]:
         parser = JUnitXMLParser()
