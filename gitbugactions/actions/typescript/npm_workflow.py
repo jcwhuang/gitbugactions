@@ -120,6 +120,9 @@ class NpmWorkflow(GitHubWorkflow):
                 if "steps" in job:
                     for step in job["steps"]:
                         if "run" in step and self._is_test_command(step["run"]):
+                            # Rename test step
+                            step["name"] = "Run tests"
+
                             step["run"] = step["run"].strip()
                             # Check if the test command is defined in package.json
                             package_json_path = Path(self.repo_path) / "package.json"
@@ -187,6 +190,7 @@ class NpmWorkflow(GitHubWorkflow):
                                     package_json = json.dump(package_json, f)
                             else:
                                 print("No test command found in package.json.")
+                            return
 
     def get_test_results(self, repo_path) -> List[TestCase]:
         parser = JUnitXMLParser()
