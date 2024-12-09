@@ -19,6 +19,10 @@ class NpmWorkflow(GitHubWorkflow):
     ]
     REPORT_LOCATION = "report.xml"
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.test_command = ""
+
     def _is_test_command(self, command) -> bool:
         return self.__is_command(command, ["test", "run test"])[0]
 
@@ -41,6 +45,7 @@ class NpmWorkflow(GitHubWorkflow):
 
             # Get the test command from package.json
             test_cmd = package_json.get("scripts", {}).get("test", "")
+            self.test_command = test_cmd.split(" ")[0]
 
             for _, job in self.doc["jobs"].items():
                 if "steps" in job:
@@ -53,6 +58,7 @@ class NpmWorkflow(GitHubWorkflow):
                     # Job with tests
                     # Insert steps to install dependencies for generating JUnit XML output
                     if "jest" in test_cmd:
+                        self.test_command = "jest"
                         logger.info(
                             "Jest detected, adding jest-junit installation step..."
                         )
@@ -129,13 +135,13 @@ class NpmWorkflow(GitHubWorkflow):
                                 "test", ""
                             )
                             logger.info(f"Original test command: {test_command}")
-                            npm_test_command = step["run"]
 
                             if test_command:
                                 # Update the test command to output junitxml results
                                 if "jest" in test_command:
                                     # Jest: Add reporter to output in junitxml format
                                     # See https://jestjs.io/docs/cli#--reporters
+                                    # default output file name (unconfigurable) is junit.xml
                                     if "--reporters" not in test_command:
                                         test_command = (
                                             test_command
@@ -190,7 +196,7 @@ class NpmWorkflow(GitHubWorkflow):
         return parser.get_test_results(str(Path(repo_path, "junit.xml")))
 
     def get_build_tool(self) -> str:
-        return "npm"
+        return f"npm, {self.test_command}"
 
     def get_report_location(self) -> str:
         return self.REPORT_LOCATION
