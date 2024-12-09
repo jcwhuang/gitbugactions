@@ -93,7 +93,7 @@ class GitHubWorkflow(ABC):
                                 str(step["run"])
                             ):
                                 step["name"] = "Run tests"
-                            elif step["name"] == "Run tests":
+                            elif step.get("name", "") == "Run tests":
                                 step["name"] = "previous Run tests"
         except yaml.YAMLError:
             return
