@@ -75,7 +75,7 @@ class CargoWorkflow(GitHubWorkflow):
                                 )
 
                             # Ensure the command uses `--` for test runner arguments
-                            if "--" not in step["run"]:
+                            if " -- " not in step["run"]:
                                 step["run"] = re.sub(
                                     r"cargo test",
                                     "cargo test --",
