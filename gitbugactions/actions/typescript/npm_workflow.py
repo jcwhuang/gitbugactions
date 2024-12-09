@@ -135,10 +135,11 @@ class NpmWorkflow(GitHubWorkflow):
                                 # Update the test command to output junitxml results
                                 if "jest" in test_command:
                                     # Jest: Add reporter to output in junitxml format
+                                    # See https://jestjs.io/docs/cli#--reporters
                                     if "--reporters" not in test_command:
                                         test_command = (
                                             test_command
-                                            + " --reporters=default --reporters=jest-junit --outputName report.xml"
+                                            + " --reporters=default --reporters=jest-junit"
                                         )
                                     else:
                                         test_command = test_command.replace(
@@ -186,7 +187,7 @@ class NpmWorkflow(GitHubWorkflow):
         logger.info(f"Looking for test results at {repo_path}")
         run = subprocess.run(f"ls {repo_path}", shell=True, capture_output=True)
         logger.info(f"Results of ls {repo_path}: {run.stdout}")
-        return parser.get_test_results(str(Path(repo_path, "report.xml")))
+        return parser.get_test_results(str(Path(repo_path, "junit.xml")))
 
     def get_build_tool(self) -> str:
         return "npm"
