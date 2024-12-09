@@ -5,6 +5,9 @@ import re
 
 from gitbugactions.actions.workflow import GitHubWorkflow
 from gitbugactions.actions.multi.junitxmlparser import JUnitXMLParser
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class CargoWorkflow(GitHubWorkflow):
@@ -95,6 +98,7 @@ class CargoWorkflow(GitHubWorkflow):
                             # Ensure the command pipes to cargo2junit and writes to results.xml
                             if "cargo2junit" not in step["run"]:
                                 step["run"] += " | cargo2junit > results.xml"
+                            logger.info(f"test command is {step['run']}")
 
     def get_test_results(self, repo_path) -> List[TestCase]:
         parser = JUnitXMLParser()
