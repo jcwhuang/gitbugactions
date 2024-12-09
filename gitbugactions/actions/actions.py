@@ -285,9 +285,6 @@ class Act:
             elif len(client.images.list(name=runner_image)) == 1:
                 Act.__IMAGE_SETUP = True
                 return
-            elif runner_image != Act.__DEFAULT_IMAGE:
-                logger.error(f"Base image {runner_image} does not exist")
-                exit(-1)
 
             # Creates crawler image
             if len(client.images.list(name="gitbugactions")) > 0:
