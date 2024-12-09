@@ -71,33 +71,26 @@ class CargoWorkflow(GitHubWorkflow):
                             # see https://github.com/johnterickson/cargo2junit
                             # Ensure the base command starts with RUSTC_BOOTSTRAP=1
                             if not step["run"].startswith("RUSTC_BOOTSTRAP=1"):
-                                step["run"] = re.sub(
-                                    r"^cargo test",
-                                    "RUSTC_BOOTSTRAP=1 cargo test",
-                                    step["run"],
-                                )
+                                step["run"] = f"RUSTC_BOOTSTRAP=1 {step['run']}"
 
                             # Ensure the command uses `--` for test runner arguments
                             if " -- " not in step["run"]:
                                 step["run"] = re.sub(
-                                    r"cargo test",
-                                    "cargo test --",
-                                    step["run"],
+                                    r"(cargo test[^\n]*)", r"\1 --", step["run"]
                                 )
 
-                            # Add necessary flags if not present
+                            # Add required test runner arguments if they are not present
                             if "-Z unstable-options" not in step["run"]:
                                 step["run"] += " -Z unstable-options"
-
                             if "--format json" not in step["run"]:
                                 step["run"] += " --format json"
-
                             if "--report-time" not in step["run"]:
                                 step["run"] += " --report-time"
 
                             # Ensure the command pipes to cargo2junit and writes to results.xml
                             if "cargo2junit" not in step["run"]:
                                 step["run"] += " | cargo2junit > results.xml"
+
                             logger.info(f"test command is {step['run']}")
 
     def get_test_results(self, repo_path) -> List[TestCase]:
