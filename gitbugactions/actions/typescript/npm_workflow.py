@@ -121,7 +121,6 @@ class NpmWorkflow(GitHubWorkflow):
                     for step in job["steps"]:
                         if "run" in step and self._is_test_command(step["run"]):
                             # Rename test step
-                            step["name"] = "Run tests"
 
                             step["run"] = step["run"].strip()
                             # Check if the test command is defined in package.json
