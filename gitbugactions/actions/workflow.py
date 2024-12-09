@@ -75,6 +75,29 @@ class GitHubWorkflow(ABC):
         except yaml.YAMLError:
             return False
 
+    def rename_test_step(self) -> None:
+        """
+        Rename test step to "Run tests".
+        Renames any other step called "Run tests".
+
+        Returns:
+            None
+        """
+        try:
+            # Check if any run command is a test running command
+            if "jobs" in self.doc and isinstance(self.doc["jobs"], dict):
+                for _, job in self.doc["jobs"].items():
+                    if "steps" in job and isinstance(job["steps"], list):
+                        for step in job["steps"]:
+                            if "run" in step and self._is_test_command(
+                                str(step["run"])
+                            ):
+                                step["name"] = "Run tests"
+                            elif step["name"] == "Run tests":
+                                step["name"] = "previous Run tests"
+        except yaml.YAMLError:
+            return
+
     def get_actions(self) -> Set[Action]:
         actions: Set[Action] = set()
         if "jobs" in self.doc and isinstance(self.doc["jobs"], dict):

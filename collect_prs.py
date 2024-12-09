@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-
+import re
 import tempfile
 import os, traceback
 import json
@@ -48,6 +48,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
     def __init__(self, data_path: str, base_image: str):
         self.data_path = data_path
         self.base_image = base_image
+        self.runner_image = f"gitbugactions:-{re.sub(':', '-', self.base_image)}"
         self.uuid = str(uuid.uuid1())
 
     def save_data(self, data: dict, repo: MinimalRepository):
@@ -89,7 +90,10 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             data["clone_success"] = True
 
             actions = GitHubActions(
-                repo_path, pr.repo.language, base_image=self.base_image
+                repo_path,
+                pr.repo.language,
+                runner_image=self.runner_image,
+                base_image=self.base_image,
             )
             data["number_of_actions"] = len(actions.workflows)
             data["actions_build_tools"] = [

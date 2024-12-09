@@ -4,7 +4,7 @@ import uuid
 import time
 import subprocess
 import threading
-
+import re
 from typing import List, Dict, Set
 from abc import ABC, abstractmethod
 from junitparser import TestCase, Error
@@ -230,7 +230,7 @@ class Act:
     __FLAGS = f"--pull=false --no-cache-server --bind"  # error with this flag: --max-parallel 1"
     __SETUP_LOCK = threading.Lock()
     __MEMORY_LIMIT = "7g"
-    __DEFAULT_IMAGE = "gitbugactions:latest"
+    __DEFAULT_IMAGE = "gitbugactions:ubuntu-act-latest"
 
     def __init__(
         self,
@@ -304,7 +304,8 @@ class Act:
                 f.write(dockerfile)
 
             logger.info("Building image")
-            client.images.build(path="./", tag="gitbugactions", forcerm=True)
+            tag = re.sub(":", "-", base_image)
+            client.images.build(path="./", tag=tag, forcerm=True)
             os.remove("Dockerfile")
             Act.__IMAGE_SETUP = True
             logger.info("Done setting up image")
@@ -391,7 +392,7 @@ class GitHubActions:
         repo_path,
         language: str | None,
         keep_containers: bool = False,
-        runner_image: str = "gitbugactions:latest",
+        runner_image: str = "gitbugactions-ubuntu:act-latest",
         base_image: str = "ubuntu:act-latest",
         offline: bool = False,
     ):
@@ -429,6 +430,7 @@ class GitHubActions:
                 workflow.instrument_cache_steps()
                 workflow.instrument_setup_steps()
                 workflow.instrument_test_steps()
+                workflow.rename_test_step()
                 if offline:
                     workflow.instrument_offline_execution()
                 else:
