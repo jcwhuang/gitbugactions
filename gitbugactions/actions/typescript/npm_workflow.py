@@ -19,8 +19,8 @@ class NpmWorkflow(GitHubWorkflow):
     ]
     REPORT_LOCATION = "report.xml"
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.test_command = ""
 
     def _is_test_command(self, command) -> bool:
