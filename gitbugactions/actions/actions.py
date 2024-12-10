@@ -237,7 +237,7 @@ class Act:
         reuse: bool = False,
         timeout=5,
         runner_image: str = __DEFAULT_IMAGE,
-        base_image: str = "ubuntu:act-latest",
+        base_image: str = "ubuntu:act-22.04",
         offline: bool = False,
         fail_strategy: ActFailureStrategy = ActTestsFailureStrategy(),
     ):
@@ -392,6 +392,7 @@ class GitHubActions:
         runner_image: str = "gitbugactions-ubuntu:act-latest",
         base_image: str = "ubuntu:act-latest",
         offline: bool = False,
+        rename_test_workflows: bool = True,
     ):
         self.repo_path = repo_path
         self.keep_containers = keep_containers
@@ -432,14 +433,14 @@ class GitHubActions:
                     workflow.instrument_offline_execution()
                 else:
                     workflow.instrument_online_execution()
-
-                filename = os.path.basename(workflow.path)
-                dirpath = os.path.dirname(workflow.path)
-                new_filename = (
-                    filename.split(".")[0] + "-crawler." + filename.split(".")[1]
-                )
-                new_path = os.path.join(dirpath, new_filename)
-                workflow.path = new_path
+                if rename_test_workflows:
+                    filename = os.path.basename(workflow.path)
+                    dirpath = os.path.dirname(workflow.path)
+                    new_filename = (
+                        filename.split(".")[0] + "-crawler." + filename.split(".")[1]
+                    )
+                    new_path = os.path.join(dirpath, new_filename)
+                    workflow.path = new_path
 
                 self.test_workflows.append(workflow)
 

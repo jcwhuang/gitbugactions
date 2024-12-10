@@ -59,6 +59,8 @@ class CargoWorkflow(GitHubWorkflow):
                             + f"cp Cargo.toml {CargoWorkflow.GITBUG_CACHE} || :",
                         }
                     )
+                    job["steps"].insert(0, {"uses": "actions/checkout@v4"})
+                    job["steps"].insert(1, {"uses": "dtolnay/rust-toolchain@stable"})
                     return
 
     def instrument_test_steps(self):
