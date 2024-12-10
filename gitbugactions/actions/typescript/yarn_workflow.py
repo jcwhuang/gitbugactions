@@ -3,16 +3,19 @@ from junitparser import TestCase
 from pathlib import Path
 import re
 
-from gitbugactions.actions.workflow import GitHubWorkflow
+from gitbugactions.actions.typescript.package_workflow import PackageWorkflow
 from gitbugactions.actions.multi.junitxmlparser import JUnitXMLParser
 
 
-class YarnWorkflow(GitHubWorkflow):
+class YarnWorkflow(PackageWorkflow):
     BUILD_TOOL_KEYWORDS = ["yarn"]
     __COMMAND_PATTERNS = [
         r"yarn\s+(([^\s]+\s+)*)?",
     ]
     REPORT_LOCATION = "report.xml"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__("yarn", *args, **kwargs)
 
     def _is_test_command(self, command) -> bool:
         return self.__is_command(command, ["test", "run test"])[0]
@@ -23,12 +26,6 @@ class YarnWorkflow(GitHubWorkflow):
                 if re.search(pattern + keyword, command):
                     return True, keyword
         return False, ""
-
-    def instrument_online_execution(self):
-        pass
-
-    def instrument_test_steps(self):
-        pass
 
     def get_test_results(self, repo_path) -> List[TestCase]:
         parser = JUnitXMLParser()
