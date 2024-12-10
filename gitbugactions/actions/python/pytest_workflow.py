@@ -15,6 +15,7 @@ class PytestWorkflow(GitHubWorkflow):
         r"py.test",
         r"python([23](\.\d+)?)?\s+(([^\s]+\s+)*)?-m\s+pytest",  # Matches commands that call pytest through python's module option
     ]
+    REPORT_LOCATION = "report.xml"
 
     def _is_test_command(self, command) -> bool:
         # Checks if the given command matches any of the tests command patterns
@@ -58,3 +59,6 @@ class PytestWorkflow(GitHubWorkflow):
 
     def get_build_tool(self) -> str:
         return "pytest"
+
+    def get_report_location(self) -> str:
+        return self.REPORT_LOCATION

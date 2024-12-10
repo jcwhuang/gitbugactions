@@ -13,6 +13,7 @@ class MavenWorkflow(GitHubWorkflow):
     __TESTS_COMMAND_PATTERNS = [
         r"(maven|mvn|mavenw|mvnw)\s+(([^\s]+\s+)*)?(test|package|verify|install)",
     ]
+    REPORT_LOCATION = "target/surefire-reports"
 
     def _is_test_command(self, command) -> bool:
         # Checks if the given command matches any of the tests command patterns
@@ -41,3 +42,6 @@ class MavenWorkflow(GitHubWorkflow):
 
     def get_build_tool(self) -> str:
         return "maven"
+
+    def get_report_location(self) -> str:
+        return self.REPORT_LOCATION

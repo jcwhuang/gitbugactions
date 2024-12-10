@@ -14,6 +14,7 @@ class GoWorkflow(GitHubWorkflow):
         r"go\s+(([^\s]+\s+)*)?",
     ]
     GITBUG_CACHE = "~/gitbug-cache"
+    REPORT_LOCATION = "report.xml"
 
     def _is_test_command(self, command) -> bool:
         return self.__is_command(command, ["test"])[0]
@@ -144,3 +145,6 @@ class GoWorkflow(GitHubWorkflow):
 
     def get_build_tool(self) -> str:
         return "go"
+
+    def get_report_location(self) -> str:
+        return self.REPORT_LOCATION

@@ -20,3 +20,6 @@ class UnknownWorkflow(GitHubWorkflow):
 
     def get_build_tool(self) -> str:
         return "unknown"
+
+    def get_report_location(self) -> str:
+        pass

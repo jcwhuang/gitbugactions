@@ -13,6 +13,7 @@ class GradleWorkflow(GitHubWorkflow):
     __TESTS_COMMAND_PATTERNS = [
         r"(gradle|gradlew)\s+(([^\s]+\s+)*)?(test|check|build|buildDependents|buildNeeded)",
     ]
+    REPORT_LOCATION = "build/test-results/test"
 
     def _is_test_command(self, command) -> bool:
         # Checks if the given command matches any of the tests command patterns
@@ -41,3 +42,6 @@ class GradleWorkflow(GitHubWorkflow):
 
     def get_build_tool(self) -> str:
         return "gradle"
+
+    def get_report_location(self) -> str:
+        return self.REPORT_LOCATION

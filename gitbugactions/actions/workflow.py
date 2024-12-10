@@ -359,6 +359,10 @@ class GitHubWorkflow(ABC):
         with open(new_path, "w") as file:
             yaml.dump(self.doc, file)
 
+    @abstractmethod
+    def get_report_location(self) -> str:
+        pass
+
 
 from gitbugactions.actions.multi.unknown_workflow import UnknownWorkflow
 from gitbugactions.actions.java.maven_workflow import MavenWorkflow

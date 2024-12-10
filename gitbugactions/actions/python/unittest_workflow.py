@@ -14,6 +14,7 @@ class UnittestWorkflow(GitHubWorkflow):
         r"python([23](\.\d+)?)?\s+(([^\s]+\s+)*)?-m\s+unittest",  # Matches commands that call unittest through python's module option
         r"python([23](\.\d+)?)?\s+(([^\s]+\s+)*)?-m\s+xmlrunner",  # Matches commands that call xlmrunner through python's module option
     ]
+    REPORT_LOCATION = "test_reports"
 
     def _is_test_command(self, command) -> bool:
         # Checks if the given command matches any of the tests command patterns
@@ -59,3 +60,6 @@ class UnittestWorkflow(GitHubWorkflow):
 
     def get_build_tool(self) -> str:
         return "unittest"
+
+    def get_report_location(self) -> str:
+        return self.REPORT_LOCATION
