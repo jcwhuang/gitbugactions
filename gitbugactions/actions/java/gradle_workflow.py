@@ -11,7 +11,7 @@ class GradleWorkflow(GitHubWorkflow):
     BUILD_TOOL_KEYWORDS = ["gradle", "gradlew"]
     # Regex patterns to match gradle commands
     __TESTS_COMMAND_PATTERNS = [
-        r"(gradle|gradlew)\s+(([^\s]+\s+)*)?(test|check|build|buildDependents|buildNeeded)",
+        r"(gradle|\.\/gradlew)\s+(([^\s]+\s+)*)?(test|check|build|buildDependents|buildNeeded)",
     ]
     REPORT_LOCATION = "build/test-results/test"
 
