@@ -89,19 +89,16 @@ class PackageWorkflow(GitHubWorkflow):
                         if "run" in step and self._is_test_command(step["run"]):
                             # Rename test step
                             break
+
+        # alias command
         job["steps"].insert(
             i,
             {
-                "name": "gitbug-actions sanity check jest",
-                "run": "jest --version"
-            }
-        )
-        # alias command
-        job["steps"].insert(
-            i+1,
-            {
                 "name": "gitbug-actions Alias jest with junit flags",
-                "run": "echo 'jest() { jest \"$@\" --reporter=junit --reporter-options outputFile=test-results.xml; }' >> $GITHUB_PATH",
+                "run": """|
+alias jest=\"jest --reporters=default --reporters=jest-junit \"$@\"\"' >> $BASH_ENV
+source $BASH_ENV
+""",
             },
         )
 
