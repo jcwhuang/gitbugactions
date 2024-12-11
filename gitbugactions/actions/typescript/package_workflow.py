@@ -29,7 +29,8 @@ class PackageWorkflow(GitHubWorkflow):
                 for i, step in enumerate(job["steps"]):
                     if "run" in step and self._is_install_command(step["run"]):
                         break
-        job["steps"].insert(i, self.get_install_step())
+        if self.get_install_step() is not None:
+            job["steps"].insert(i, self.get_install_step())
 
     def instrument_online_execution(self):
         if self.has_tests():
@@ -54,36 +55,21 @@ class PackageWorkflow(GitHubWorkflow):
                     else:
                         continue
 
-                    # Job with tests
-                    # Insert steps to install dependencies for generating JUnit XML output
-                    if "jest" in test_cmd:
-                        self.test_command = "jest"
-                        logger.info(
-                            "Jest detected, adding jest-junit installation step..."
-                        )
-                        job["steps"].insert(
-                            i,
-                            {
-                                "name": "gitbug-actions Install jest-junit",
-                                "run": f"{self.build_tool_keyword} add jest-junit",
-                            },
-                        )
-                    elif "mocha" in test_cmd:
-                        logger.info(
-                            "Mocha detected, adding mocha-junit-reporter installation step..."
-                        )
-                        job["steps"].insert(
-                            i,
-                            {
-                                "name": "gitbug-actions Install mocha-junit-reporter",
-                                "run": f"{self.build_tool_keyword} add mocha-junit-reporter",
-                            },
-                        )
-                    else:
-                        logger.error(
-                            "No recognized test framework found in the test command."
-                        )
-                        return
+                    job["steps"].insert(
+                        i,
+                        {
+                            "name": "gitbug-actions Install jest-junit",
+                            "run": f"{self.build_tool_keyword} add jest-junit",
+                        },
+                    )
+
+                    job["steps"].insert(
+                        i,
+                        {
+                            "name": "gitbug-actions Install mocha-junit-reporter",
+                            "run": f"{self.build_tool_keyword} add mocha-junit-reporter",
+                        },
+                    )
 
                     # Insert a npm install step to install all dependencies
                     job["steps"].insert(
@@ -105,9 +91,9 @@ class PackageWorkflow(GitHubWorkflow):
                             break
         # alias command
         job["steps"].insert(
-            i + 1,
+            i,
             {
-                "name": "Alias jest with junit flags",
+                "name": "gitbug-actions Alias jest with junit flags",
                 "run": "echo 'jest() { jest \"$@\" --reporter=junit --reporter-options outputFile=test-results.xml; }' >> $GITHUB_ENV",
             },
         )
