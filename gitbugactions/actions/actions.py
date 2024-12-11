@@ -429,6 +429,7 @@ class GitHubActions:
                 workflow.instrument_jobs()
                 workflow.instrument_cache_steps()
                 workflow.instrument_setup_steps()
+                workflow.instrument_installation()
                 workflow.instrument_test_steps()
                 workflow.rename_test_step()
                 if offline:
