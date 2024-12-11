@@ -102,7 +102,7 @@ class PackageWorkflow(GitHubWorkflow):
             i + 1,
             {
                 "name": "gitbug-actions Check if jest got aliased correctly",
-                "run": "jest --version",
+                "run": "type jest",
             },
         )
 
