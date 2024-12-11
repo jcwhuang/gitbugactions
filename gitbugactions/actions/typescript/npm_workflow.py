@@ -24,7 +24,7 @@ class NpmWorkflow(PackageWorkflow):
     def _is_test_command(self, command) -> bool:
         return self.__is_command(command, ["test", "run test"])[0]
     
-    def _is_install_command(self):
+    def _is_install_command(self, command):
         pass
 
     def get_install_step(self):
