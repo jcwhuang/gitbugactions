@@ -90,6 +90,22 @@ class PackageWorkflow(GitHubWorkflow):
                             # Rename test step
                             break
 
+        job["steps"].insert(
+            i,
+            {
+                "name": "gitbug-actions Print env",
+                "run": "env",
+            },
+        )
+
+        job["steps"].insert(
+            i + 1,
+            {
+                "name": "gitbug-actions alias jest",
+                "run": "alias jest",
+            },
+        )
+
         # step["run"] = step["run"].strip()
         # # Check if the test command is defined in package.json
         # package_json_path = Path(self.repo_path) / "package.json"
