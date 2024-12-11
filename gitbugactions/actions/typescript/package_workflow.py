@@ -98,6 +98,23 @@ class PackageWorkflow(GitHubWorkflow):
             },
         )
 
+        job["steps"].insert(
+            i,
+            {
+                "name": "gitbug-actions Check if jest got aliased correctly",
+                "run": "jest --version && declare -f jest",
+            },
+        )
+
+        # alias command
+        job["steps"].insert(
+            i,
+            {
+                "name": "gitbug-actions Alias vitest with junit flags",
+                "run": 'echo \'vitest() { if [ "$1" = "run" ]; then shift; vitest run "$@" --reporter=junit --reporter-options outputFile=test-results.xml; else vitest "$@" --reporter=junit --reporter-options outputFile=test-results.xml; fi }\' >> $GITHUB_ENV',
+            },
+        )
+
         # step["run"] = step["run"].strip()
         # # Check if the test command is defined in package.json
         # package_json_path = Path(self.repo_path) / "package.json"
