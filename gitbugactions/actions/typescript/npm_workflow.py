@@ -23,6 +23,12 @@ class NpmWorkflow(PackageWorkflow):
 
     def _is_test_command(self, command) -> bool:
         return self.__is_command(command, ["test", "run test"])[0]
+    
+    def _is_install_command(self):
+        pass
+
+    def get_install_step(self):
+        pass
 
     def __is_command(self, command: str, keywords: List[str]) -> Tuple[bool, str]:
         for keyword in keywords:
