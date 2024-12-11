@@ -94,21 +94,21 @@ class PackageWorkflow(GitHubWorkflow):
             i,
             {
                 "name": "gitbug-actions Alias jest with junit flags",
-                "run": "echo 'jest() { jest \"$@\" --reporter=junit --reporter-options outputFile=test-results.xml; }' >> $GITHUB_ENV",
+                "run": "echo 'jest() { jest \"$@\" --reporter=junit --reporter-options outputFile=test-results.xml; }' >> $GITHUB_PATH",
             },
         )
 
         job["steps"].insert(
-            i,
+            i + 1,
             {
                 "name": "gitbug-actions Check if jest got aliased correctly",
-                "run": "jest --version && declare -f jest",
+                "run": "jest --version",
             },
         )
 
         # alias command
         job["steps"].insert(
-            i,
+            i + 2,
             {
                 "name": "gitbug-actions Alias vitest with junit flags",
                 "run": 'echo \'vitest() { if [ "$1" = "run" ]; then shift; vitest run "$@" --reporter=junit --reporter-options outputFile=test-results.xml; else vitest "$@" --reporter=junit --reporter-options outputFile=test-results.xml; fi }\' >> $GITHUB_ENV',
