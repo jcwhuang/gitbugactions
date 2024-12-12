@@ -117,12 +117,12 @@ class PackageWorkflow(GitHubWorkflow):
                                     if "--reporter" not in test_command:
                                         test_command = (
                                             test_command
-                                            + " --reporter=junit --outputFile=junit.xml"
+                                            + " --reporter=default --reporter=junit --outputFile.junit=junit.xml"
                                         )
                                     else:
                                         test_command = test_command.replace(
-                                            "--reporter",
-                                            "--reporter=junit --outputFile=junit.xml",
+                                            "--reporter=default",
+                                            "--reporter=default --reporter=junit --outputFile.junit=junit.xml",
                                         )
 
                                 # Update package.json with the modified test command
