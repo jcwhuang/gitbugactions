@@ -22,6 +22,3 @@ class NpmWorkflow(PackageWorkflow):
                 if re.search(pattern + keyword, command):
                     return True, keyword
         return False, ""
-
-    def get_build_tool(self) -> str:
-        return "pnpm"

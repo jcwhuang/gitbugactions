@@ -226,9 +226,6 @@ class GitHubWorkflow(ABC):
                         step["with"] = {"token": token.token}
                         self.tokens.append(token)
 
-    def instrument_installation(self):
-        pass
-
     def instrument_offline_execution(self):
         """
         Instruments the workflow for an offline execution.

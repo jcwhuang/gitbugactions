@@ -21,23 +21,6 @@ class PackageWorkflow(GitHubWorkflow):
         self.build_tool_keyword = build_tool_keyword
         self.test_command = ""
 
-    @abstractmethod
-    def _is_install_command(self):
-        pass
-
-    @abstractmethod
-    def get_install_step(self) -> dict:
-        pass
-
-    def instrument_installation(self):
-        for _, job in self.doc["jobs"].items():
-            if "steps" in job:
-                for i, step in enumerate(job["steps"]):
-                    if "run" in step and self._is_install_command(step["run"]):
-                        break
-        if self.get_install_step() is not None:
-            job["steps"].insert(i, self.get_install_step())
-
     def instrument_online_execution(self):
         if self.has_tests():
             # alias
@@ -133,7 +116,7 @@ class PackageWorkflow(GitHubWorkflow):
                                     else:
                                         test_command = test_command.replace(
                                             "--reporters=default",
-                                            "--reporters=default --reporters=jest-junit --outputName report.xml",
+                                            "--reporters=default --reporters=jest-junit",
                                         )
                                 elif "mocha" in test_command:
                                     # Mocha: Add reporter to output in junitxml format
