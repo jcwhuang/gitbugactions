@@ -23,19 +23,6 @@ class PackageWorkflow(GitHubWorkflow):
 
     def instrument_online_execution(self):
         if self.has_tests():
-            # alias
-            package_json_path = Path(self.repo_path) / "package.json"
-            if package_json_path.exists():
-                with open(package_json_path, "r") as f:
-                    package_json = json.load(f)
-            else:
-                logger.warning("Couldn't find package.json")
-                return
-
-            # Get the test command from package.json
-            test_cmd = package_json.get("scripts", {}).get("test", "")
-            self.test_command = test_cmd.split(" ")[0]
-
             for _, job in self.doc["jobs"].items():
                 if "steps" in job:
                     for i, step in enumerate(job["steps"]):
@@ -76,16 +63,7 @@ class PackageWorkflow(GitHubWorkflow):
                 if "steps" in job:
                     for i, step in enumerate(job["steps"]):
                         if "run" in step and self._is_test_command(step["run"]):
-
-                            # step["run"] = f"source ~/.bashrc && {step['run']}"
-                            # job["steps"].insert(
-                            #     i,
-                            #     {
-                            #         "name": "gitbug-actions Print env",
-                            #         "run": "cat ~/.bashrc && source ~/.bashrc",
-                            #     },
-                            # )
-
+                            # TODO: this step is duplicated between online and here
                             step["run"] = step["run"].strip()
                             # Check if the test command is defined in package.json
                             package_json_path = Path(self.repo_path) / "package.json"
@@ -97,10 +75,15 @@ class PackageWorkflow(GitHubWorkflow):
                                 return
 
                             # Extract the test command from the "scripts" section
-                            test_command = package_json.get("scripts", {}).get(
-                                "test", ""
+                            run_command = step["run"].strip()
+                            test_name = self._get_test_keyword(run_command)
+                            logger.info(
+                                f"Looking under package.json['scripts']['{test_name}']"
                             )
-                            logger.info(f"Original test command: {test_command}")
+                            test_command = package_json.get("scripts", {}).get(
+                                test_name, ""
+                            )
+                            logger.info(f"Test command is {test_command}")
 
                             if test_command:
                                 # Update the test command to output junitxml results
@@ -131,20 +114,20 @@ class PackageWorkflow(GitHubWorkflow):
                                             "--reporter mocha-junit-reporter",
                                         )
                                 elif "vitest" in test_command or "vite" in test_command:
-                                    # Vitest/Vite: Add reporter for JUnit XML output
                                     if "--reporter" not in test_command:
                                         test_command = (
                                             test_command
-                                            + " --reporter vite-plugin-junit-reporter --reporter-options output=report.xml"
+                                            + " --reporter=junit --outputFile=junit.xml"
                                         )
                                     else:
                                         test_command = test_command.replace(
                                             "--reporter",
-                                            "--reporter vite-plugin-junit-reporter --reporter-options output=report.xml",
+                                            "--reporter=junit --outputFile=junit.xml",
                                         )
 
                                 # Update package.json with the modified test command
                                 package_json["scripts"]["test"] = test_command
+                                logger.info(f"New test command is {test_command}")
                                 with open(package_json_path, "w") as f:
                                     package_json = json.dump(package_json, f)
                             else:
@@ -163,3 +146,7 @@ class PackageWorkflow(GitHubWorkflow):
 
     def get_report_location(self) -> str:
         return self.REPORT_LOCATION
+
+    @abstractmethod
+    def _get_test_keyword(self, command: str) -> str:
+        pass
