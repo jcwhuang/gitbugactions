@@ -104,13 +104,13 @@ class PackageWorkflow(GitHubWorkflow):
             },
         )
 
-        job["steps"].insert(
-            i + 1,
-            {
-                "name": "gitbug-actions alias jest",
-                "run": "type jest",
-            },
-        )
+        # job["steps"].insert(
+        #     i + 1,
+        #     {
+        #         "name": "gitbug-actions alias jest",
+        #         "run": "type jest",
+        #     },
+        # )
 
         # step["run"] = step["run"].strip()
         # # Check if the test command is defined in package.json
