@@ -1,14 +1,20 @@
 from abc import abstractmethod
+from junitparser import TestCase
 from pathlib import Path
+from typing import List
 import json
+import subprocess
 
 from gitbugactions.actions.workflow import GitHubWorkflow
+from gitbugactions.actions.multi.junitxmlparser import JUnitXMLParser
 from gitbugactions.logger import get_logger
 
 logger = get_logger(__name__)
 
 
 class PackageWorkflow(GitHubWorkflow):
+
+    REPORT_LOCATION = "junit.xml"
 
     def __init__(self, build_tool_keyword, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -94,7 +100,7 @@ class PackageWorkflow(GitHubWorkflow):
             i,
             {
                 "name": "gitbug-actions Print env",
-                "run": "cat ~/.bashrc && echo \"source ~/.bashrc\" >> ~/.bash_profile",
+                "run": "cat ~/.bashrc && source ~/.bashrc",
             },
         )
 
@@ -177,3 +183,13 @@ class PackageWorkflow(GitHubWorkflow):
 
     def get_build_tool(self) -> str:
         return f"{self.build_tool_keyword}, {self.test_command}"
+
+    def get_test_results(self, repo_path) -> List[TestCase]:
+        parser = JUnitXMLParser()
+        logger.info(f"Looking for test results at {repo_path}")
+        run = subprocess.run(f"ls {repo_path}", shell=True, capture_output=True)
+        logger.info(f"Results of ls {repo_path}: {run.stdout}")
+        return parser.get_test_results(str(Path(repo_path, "junit.xml")))
+
+    def get_report_location(self) -> str:
+        return self.REPORT_LOCATION
