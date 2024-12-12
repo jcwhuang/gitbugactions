@@ -3,6 +3,7 @@ from junitparser import TestCase
 from pathlib import Path
 from typing import List
 import json
+import re
 import subprocess
 
 from gitbugactions.actions.workflow import GitHubWorkflow
@@ -124,15 +125,14 @@ class PackageWorkflow(GitHubWorkflow):
                     "--reporter mocha-junit-reporter",
                 )
         elif "vitest" in test_command or "vite" in test_command:
-            if "--reporter" not in test_command:
+            if "--reporter=junit" not in test_command:
                 test_command = (
                     test_command
                     + " --reporter=default --reporter=junit --outputFile=junit.xml"
                 )
-            else:
-                test_command = test_command.replace(
-                    "--reporter=default",
-                    "--reporter=default --reporter=junit --outputFile=junit.xml",
+            elif "--reporter=junit" in test_command:
+                test_command = re.sub(
+                    r"--outputFile=[^\s]+", "--outputFile=junit.xml", test_command
                 )
         return test_command
 
