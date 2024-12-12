@@ -27,7 +27,9 @@ class YarnWorkflow(PackageWorkflow):
         return False, ""
 
     def get_install_step(self):
-        return {"name": "Install yarn", "run": "npm install --global yarn"}
+        # Note: may be able to remove this
+        # return {"name": "Install yarn", "run": "npm install --global yarn"}
+        return None
 
     def get_build_tool(self) -> str:
         return "yarn"
