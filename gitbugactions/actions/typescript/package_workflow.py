@@ -128,11 +128,11 @@ class PackageWorkflow(GitHubWorkflow):
             if "--reporter=junit" not in test_command:
                 test_command = (
                     test_command
-                    + " --reporter=default --reporter=junit --outputFile=junit.xml"
+                    + " --reporter=default --reporter=junit --outputFile.junit=junit.xml"
                 )
             elif "--reporter=junit" in test_command:
                 test_command = re.sub(
-                    r"--outputFile=[^\s]+", "--outputFile=junit.xml", test_command
+                    r"--outputFile.junit=[^\s]+", "--outputFile.junit=junit.xml", test_command
                 )
         return test_command
 
