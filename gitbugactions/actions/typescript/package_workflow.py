@@ -126,7 +126,7 @@ class PackageWorkflow(GitHubWorkflow):
                                         )
 
                                 # Update package.json with the modified test command
-                                package_json["scripts"]["test"] = test_command
+                                package_json["scripts"][test_name] = test_command
                                 logger.info(f"New test command is {test_command}")
                                 with open(package_json_path, "w") as f:
                                     package_json = json.dump(package_json, f)
