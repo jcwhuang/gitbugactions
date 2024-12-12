@@ -94,7 +94,7 @@ class PackageWorkflow(GitHubWorkflow):
             i,
             {
                 "name": "gitbug-actions Print env",
-                "run": "env",
+                "run": "cat ~/.bashrc && echo \"source ~/.bashrc\" >> ~/.bash_profile",
             },
         )
 
