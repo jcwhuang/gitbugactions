@@ -96,6 +96,7 @@ class PackageWorkflow(GitHubWorkflow):
                             # Rename test step
                             break
 
+        step["run"] = f"source ~/.bashrc && {step['run']}"
         job["steps"].insert(
             i,
             {
