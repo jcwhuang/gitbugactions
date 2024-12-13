@@ -125,6 +125,9 @@ class PackageWorkflow(GitHubWorkflow):
                     "--reporter mocha-junit-reporter",
                 )
         elif "vitest" in test_command or "vite" in test_command:
+            # See https://vitest.dev/guide/reporters.html#junit-reporter
+            # Documentation suggests we can just use outputFile, but I did not observe
+            # any junit.xml output without outputFile.junit
             if "--reporter=junit" not in test_command:
                 test_command = (
                     test_command
@@ -132,7 +135,9 @@ class PackageWorkflow(GitHubWorkflow):
                 )
             elif "--reporter=junit" in test_command:
                 test_command = re.sub(
-                    r"--outputFile.junit=[^\s]+", "--outputFile.junit=junit.xml", test_command
+                    r"--outputFile.junit=[^\s]+",
+                    "--outputFile.junit=junit.xml",
+                    test_command,
                 )
         return test_command
 
