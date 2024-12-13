@@ -115,15 +115,36 @@ class PackageWorkflow(GitHubWorkflow):
         elif "mocha" in test_command:
             # Mocha: Add reporter to output in junitxml format
             if "--reporter" not in test_command:
-                test_command = (
-                    test_command
-                    + " --reporter mocha-junit-reporter --reporter-options mochaFile=report.xml"
-                )
+                # If there's no reporter, add mocha-junit-reporter with reporter options
+                test_command += " --reporter mocha-junit-reporter --reporter-options mochaFile=junit.xml"
+            elif "--reporter mocha-junit-reporter" in test_command:
+                # If mocha-junit-reporter is already specified, ensure the correct options
+                if "--reporter-options" in test_command:
+                    # Replace existing mochaFile option if present
+                    test_command = re.sub(
+                        r"--reporter-options.*mochaFile=[^\s,]+",
+                        "--reporter-options mochaFile=junit.xml",
+                        test_command,
+                    )
+                else:
+                    # Add reporter-options if missing
+                    test_command += " --reporter-options mochaFile=junit.xml"
             else:
-                test_command = test_command.replace(
-                    "--reporter",
+                # If there's a different reporter, replace it with mocha-junit-reporter
+                test_command = re.sub(
+                    r"--reporter [^\s]+",
                     "--reporter mocha-junit-reporter",
+                    test_command,
                 )
+                # Add or update reporter-options
+                if "--reporter-options" in test_command:
+                    test_command = re.sub(
+                        r"--reporter-options.*mochaFile=[^\s,]+",
+                        "--reporter-options mochaFile=junit.xml",
+                        test_command,
+                    )
+                else:
+                    test_command += " --reporter-options mochaFile=junit.xml"
         elif "vitest" in test_command or "vite" in test_command:
             # See https://vitest.dev/guide/reporters.html#junit-reporter
             # Documentation suggests we can just use outputFile, but I did not observe
