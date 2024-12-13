@@ -84,7 +84,7 @@ class PackageWorkflow(GitHubWorkflow):
                                 test_name, ""
                             )
                             logger.info(f"Test command is {test_command}")
-
+                            self.test_command = test_command.split(" ")[0]
                             if test_command:
                                 test_command = self._add_junit_xml(test_command)
                                 # Update package.json with the modified test command
