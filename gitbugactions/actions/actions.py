@@ -293,20 +293,21 @@ class Act:
             if len(client.images.list(name="gitbugactions")) > 0:
                 client.images.remove(image="gitbugactions")
 
-            with open("Dockerfile", "w") as f:
-                client = DockerClient.getInstance()
-                # dockerfile = "FROM catthehacker/ubuntu:full-latest\n"
-                dockerfile = f"FROM catthehacker/{base_image}\n"
-                # dockerfile += f"RUN sudo usermod -u 4000000 runneradmin\n"
-                # dockerfile += f"RUN sudo groupadd -o -g {os.getgid()} {grp.getgrgid(os.getgid()).gr_name}\n"
-                # dockerfile += f"RUN sudo usermod -G {os.getgid()} runner\n"
-                # dockerfile += f"RUN sudo usermod -o -u {os.getuid()} runner\n"
-                f.write(dockerfile)
+            # using custom image, skip all this.
+            # with open("Dockerfile", "w") as f:
+            #     client = DockerClient.getInstance()
+            #     # dockerfile = "FROM catthehacker/ubuntu:full-latest\n"
+            #     dockerfile = f"FROM catthehacker/{base_image}\n"
+            #     # dockerfile += f"RUN sudo usermod -u 4000000 runneradmin\n"
+            #     # dockerfile += f"RUN sudo groupadd -o -g {os.getgid()} {grp.getgrgid(os.getgid()).gr_name}\n"
+            #     # dockerfile += f"RUN sudo usermod -G {os.getgid()} runner\n"
+            #     # dockerfile += f"RUN sudo usermod -o -u {os.getuid()} runner\n"
+            #     f.write(dockerfile)
 
-            logger.info("Building image")
-            tag = re.sub(":", "-", base_image)
-            client.images.build(path="./", tag=tag, forcerm=True)
-            os.remove("Dockerfile")
+            # logger.info("Building image")
+            # tag = re.sub(":", "-", base_image)
+            # client.images.build(path="./", tag=tag, forcerm=True)
+            # os.remove("Dockerfile")
             Act.__IMAGE_SETUP = True
             logger.info("Done setting up image")
 
