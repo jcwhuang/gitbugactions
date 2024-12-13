@@ -1,5 +1,5 @@
 import pytest
-from gitbugactions.actions.typescript.package_workflow import PackageWorkflow
+from gitbugactions.actions.typescript.package_junitxml import add_junit_xml
 
 
 @pytest.mark.parametrize(
@@ -9,14 +9,17 @@ from gitbugactions.actions.typescript.package_workflow import PackageWorkflow
             "vitest",
             "vitest --reporter=default --reporter=junit --outputFile.junit=junit.xml",
         ),
+        # rename outputFile.junit, add default reporter
         (
             "vitest --reporter=junit --outputFile.junit=oldfile.xml",
-            "vitest --reporter=junit --outputFile.junit=junit.xml",
+            "vitest --reporter=junit --outputFile.junit=junit.xml --reporter=default",
         ),
+        # existing default reporter, add junit reporter
         (
             "vitest --reporter=default",
-            "--reporter=default vitest --reporter=default --reporter=junit --outputFile.junit=junit.xml",
+            "vitest --reporter=default --reporter=junit --outputFile.junit=junit.xml",
         ),
+        # no change
         (
             "vitest --reporter=default --reporter=junit --outputFile.junit=junit.xml",
             "vitest --reporter=default --reporter=junit --outputFile.junit=junit.xml",
@@ -44,12 +47,12 @@ from gitbugactions.actions.typescript.package_workflow import PackageWorkflow
             "jest --reporters=default --reporters=jest-junit",
         ),
         (
-            "jest --reporter=default",
+            "jest --reporters=default",
             "jest --reporters=default --reporters=jest-junit",
         ),
         (
-            "jest --reporter=random",
-            "jest --reporters=default --reporters=jest-junit",
+            "jest --reporters=random",
+            "jest --reporters=random --reporters=default --reporters=jest-junit",
         ),
         (
             "jest --reporters=default --reporters=jest-junit",
@@ -58,4 +61,4 @@ from gitbugactions.actions.typescript.package_workflow import PackageWorkflow
     ],
 )
 def test_update_test_command(input_command, expected_command):
-    assert PackageWorkflow._add_junit_xml(input_command) == expected_command
+    assert add_junit_xml(input_command) == expected_command
