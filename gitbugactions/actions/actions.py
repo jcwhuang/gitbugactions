@@ -9,7 +9,8 @@ from typing import List, Dict, Set
 from abc import ABC, abstractmethod
 from junitparser import TestCase, Error
 from dataclasses import dataclass
-from gitbugactions.actions.workflow import GitHubWorkflow, GitHubWorkflowFactory
+from gitbugactions.actions.workflow import GitHubWorkflow
+from gitbugactions.actions.workflow_factory import GitHubWorkflowFactory
 from gitbugactions.github_api import GithubToken
 from gitbugactions.actions.action import Action
 from gitbugactions.docker.client import DockerClient

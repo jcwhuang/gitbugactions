@@ -86,7 +86,9 @@ class PackageWorkflow(GitHubWorkflow):
                             logger.info(f"Test command is {test_command}")
                             self.test_command = test_command.split(" ")[0]
                             if test_command:
-                                test_command = self._add_junit_xml(test_command)
+                                test_command = PackageWorkflow._add_junit_xml(
+                                    test_command
+                                )
                                 # Update package.json with the modified test command
                                 package_json["scripts"][test_name] = test_command
                                 logger.info(f"New test command is {test_command}")
@@ -96,7 +98,8 @@ class PackageWorkflow(GitHubWorkflow):
                                 logger.info("No test command found in package.json.")
                             return
 
-    def _add_junit_xml(self, test_command: str) -> str:
+    @classmethod
+    def _add_junit_xml(cls, test_command: str) -> str:
         """Depending on what testing library is used, add relevant flags to enable junit xml reporting."""
         # Update the test command to output junitxml results
         if "jest" in test_command:
@@ -150,9 +153,12 @@ class PackageWorkflow(GitHubWorkflow):
             # Documentation suggests we can just use outputFile, but I did not observe
             # any junit.xml output without outputFile.junit
             if "--reporter=junit" not in test_command:
+                # test_command = (
+                #     test_command
+                #     + " --reporter=default --reporter=junit --outputFile.junit=junit.xml"
+                # )
                 test_command = (
-                    test_command
-                    + " --reporter=default --reporter=junit --outputFile.junit=junit.xml"
+                    test_command + " --reporter=junit --outputFile.junit=junit.xml"
                 )
             elif "--reporter=junit" in test_command:
                 test_command = re.sub(

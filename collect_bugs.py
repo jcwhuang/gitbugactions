@@ -25,7 +25,8 @@ from gitbugactions.actions.actions import (
     ActCacheDirManager,
     Act,
 )
-from gitbugactions.actions.workflow import GitHubWorkflow, GitHubWorkflowFactory
+from gitbugactions.actions.workflow import GitHubWorkflow
+from gitbugactions.actions.workflow_factory import GitHubWorkflowFactory
 from gitbugactions.actions.action import Action
 from gitbugactions.test_executor import TestExecutor
 from gitbugactions.github_api import GithubAPI
