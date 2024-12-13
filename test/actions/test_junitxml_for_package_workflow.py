@@ -14,6 +14,10 @@ from gitbugactions.actions.typescript.package_junitxml import add_junit_xml
             "vitest --reporter=junit --outputFile.junit=oldfile.xml",
             "vitest --reporter=junit --outputFile.junit=junit.xml --reporter=default",
         ),
+        (
+            "vitest run --coverage",
+            "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=junit.xml",
+        ),
         # existing default reporter, add junit reporter
         (
             "vitest --reporter=default",
