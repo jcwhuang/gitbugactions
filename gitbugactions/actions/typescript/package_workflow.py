@@ -3,7 +3,6 @@ from junitparser import TestCase
 from pathlib import Path
 from typing import List
 import json
-import re
 import subprocess
 
 from gitbugactions.actions.workflow import GitHubWorkflow
