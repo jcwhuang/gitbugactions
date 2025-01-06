@@ -77,7 +77,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
 
     def make_instance_id(self, repo: MinimalRepository):
         repo_name = repo.full_name.replace("/", "__")
-        return {repo_name} - {repo.pull_number}
+        return f"{repo_name} - {repo.pull_number}"
 
     def save_workflow_info(self, data: dict):
         data_path = os.path.join(self.data_path, "workflow_info.json")
