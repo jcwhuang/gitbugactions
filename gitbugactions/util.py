@@ -21,13 +21,16 @@ def delete_repo_clone(repo_clone: pygit2.Repository):
     def retry_remove(function, path, excinfo):
         time.sleep(0.5)
         if os.path.exists(path) and os.path.isdir(path):
+            logger.info(f"Deleting repo clone at {path}")
             shutil.rmtree(path)
         elif os.path.exists(path) and os.path.isfile(path):
+            logger.info(f"Deleting repo clone at file path {path}")
             os.remove(path)
 
     repo_clone.free()
     if os.path.exists(repo_clone.workdir):
-        shutil.rmtree(repo_clone.workdir, onerror=retry_remove)
+        logger.info(f"Deleting repo clone workdir at {repo_clone.workdir}")
+        shutil.rmtree(repo_clone.workdir, onexc=retry_remove)
 
 
 def clone_repo(clone_url: str, path: str) -> pygit2.Repository:

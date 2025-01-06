@@ -89,6 +89,7 @@ class ActCacheDirManager:
                 return
             # If a random one delete it
             elif os.path.exists(act_cache_dir):
+                logger.info(f"Deleting random act cache dir {act_cache_dir}")
                 shutil.rmtree(act_cache_dir, ignore_errors=True)
                 return
         finally:
@@ -260,7 +261,7 @@ class Act:
         self.flags += "'"
 
         self.__DEFAULT_RUNNERS = (
-            f"-P ubuntu-latest=codemodelacr.azurecr.io/genai-latest:20250102.jadhuang.testyarn"
+            f"-P ubuntu-latest=codemodelacr.azurecr.io/genai-latest:20250106.jadhuang.testyarn"
         )
         self.timeout = timeout
         self.fail_strategy = fail_strategy
