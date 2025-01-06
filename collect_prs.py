@@ -13,9 +13,33 @@ from gitbugactions.actions.actions import (
     ActCacheDirManager,
     ActCheckCodeFailureStrategy,
 )
+from gitbugactions.actions.multi.unknown_workflow import UnknownWorkflow
 from gitbugactions.logger import get_logger
 
 logger = get_logger(__name__)
+CURRENT_VERSION = 1
+
+
+@dataclass
+class WorkflowInfo:
+    test_workflow_paths: list[str]
+    actions_test_build_tools: list[str]
+    num_test_workflows: int
+    num_workflows: int
+    num_unknown_workflows: int
+    head_language: str
+    base_language: str
+    language: str
+    commit_sha: str
+    repo: str
+    report_locations: list[str]
+    workflow_contents: list[str]
+    instance_id: str
+    version: int = CURRENT_VERSION
+
+    def to_json(self) -> str:
+        dict_copy = self.__dict__.copy()
+        return dict_copy
 
 
 @dataclass
@@ -51,12 +75,21 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
         self.runner_image = f"gitbugactions:{re.sub(':', '-', self.base_image)}"
         self.uuid = str(uuid.uuid1())
 
+    def make_instance_id(self, repo: MinimalRepository):
+        repo_name = repo.full_name.replace("/", "__")
+        return {repo_name} - {repo.pull_number}
+
+    def save_workflow_info(self, data: dict):
+        data_path = os.path.join(self.data_path, "workflow_info.json")
+        with open(data_path, "w") as f:
+            json.dump(data, f)
+
     def save_data(self, data: dict, repo: MinimalRepository):
         """
         Saves the data json to a file with the name of the repository
         """
-        repo_name = repo.full_name.replace("/", "__")
-        data_path = os.path.join(self.data_path, f"{repo_name}-{repo.pull_number}.json")
+        instance_id = self.make_instance_id(repo)
+        data_path = os.path.join(self.data_path, f"{instance_id}.json")
         with open(data_path, "w") as f:
             json.dump(data, f)
 
@@ -135,8 +168,11 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                     data["actions_run"][relative_workflow_path] = act_run.asdict()
             else:
                 logger.info("No test workflows")
+
+            workflow_info = self.make_workflow_info(actions, repo_path, pr, data)
             delete_repo_clone(repo_clone)
             self.save_data(data, pr.repo)
+            self.save_workflow_info(workflow_info)
 
         except Exception as e:
             logger.error(
@@ -145,3 +181,40 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
 
             delete_repo_clone(repo_clone)
             self.save_data(data, pr.repo)
+
+    def make_workflow_info(
+        self, actions: GitHubActions, repo_path: str, pr: PullRequest, data: dict
+    ):
+        num_unknown_workflows = sum(
+            [1 for w in actions.workflows if isinstance(w, UnknownWorkflow)]
+        )
+        test_workflow_paths = [
+            Path(workflow.path) for workflow in actions.test_workflows
+        ]
+        relative_test_workflow_paths = [
+            workflow_path.relative_to(repo_path)
+            for workflow_path in test_workflow_paths
+        ]
+        report_locations = [
+            workflow.get_report_location() for workflow in actions.test_workflows
+        ]
+        workflow_contents = [workflow.doc for workflow in actions.test_workflows]
+        actions_test_build_tools = [
+            workflow.get_build_tool() for workflow in actions.test_workflows
+        ]
+        workflow_info = WorkflowInfo(
+            test_workflow_paths=list(map(str, relative_test_workflow_paths)),
+            num_test_workflows=len(actions.test_workflows),
+            num_workflows=len(actions.workflows),
+            num_unknown_workflows=num_unknown_workflows,
+            head_language=data["language"],
+            base_language=data["language"],
+            language=data["language"],
+            commit_sha=data["base_commit"],
+            repo=pr.repo.full_name,
+            report_locations=report_locations,
+            workflow_contents=workflow_contents,
+            instance_id=self.make_instance_id(pr.repo.full_name),
+            actions_test_build_tools=actions_test_build_tools,
+        )
+        return workflow_info
