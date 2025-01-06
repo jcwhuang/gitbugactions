@@ -172,7 +172,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             workflow_info = self.make_workflow_info(actions, repo_path, pr, data)
             delete_repo_clone(repo_clone)
             self.save_data(data, pr.repo)
-            self.save_workflow_info(workflow_info)
+            self.save_workflow_info(workflow_info.to_json())
 
         except Exception as e:
             logger.error(
