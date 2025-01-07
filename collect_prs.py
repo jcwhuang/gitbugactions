@@ -17,7 +17,7 @@ from gitbugactions.actions.multi.unknown_workflow import UnknownWorkflow
 from gitbugactions.logger import get_logger
 
 logger = get_logger(__name__)
-CURRENT_VERSION = 1
+CURRENT_VERSION = 2
 
 
 @dataclass
