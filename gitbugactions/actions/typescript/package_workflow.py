@@ -48,15 +48,6 @@ class PackageWorkflow(GitHubWorkflow):
                             "run": f"{self.build_tool_keyword} add mocha-junit-reporter",
                         },
                     )
-
-                    # Insert a npm install step to install all dependencies
-                    job["steps"].insert(
-                        i + 1,
-                        {
-                            "name": "gitbug-actions Install dependencies",
-                            "run": f"{self.build_tool_keyword} install",
-                        },
-                    )
                     return
 
     def instrument_test_steps(self):
