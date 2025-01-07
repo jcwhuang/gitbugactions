@@ -231,7 +231,7 @@ def make_workflow_info(
             with open(filename) as f:
                 relative_file_path = str(Path(filename).relative_to(repo_path))
                 filename_to_content[relative_file_path] = f.read()
-        modify_before_test.append(filename_to_content)
+        modify_before_tests.append(filename_to_content)
     workflow_info = WorkflowInfo(
         test_workflow_paths=relative_test_workflow_paths,
         num_test_workflows=len(runnable_test_workflows),
