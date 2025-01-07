@@ -209,7 +209,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             Path(workflow.path) for workflow in runnable_test_workflows
         ]
         relative_test_workflow_paths = [
-            workflow_path.relative_to(repo_path)
+            str(workflow_path.relative_to(repo_path))
             for workflow_path in test_workflow_paths
         ]
         report_locations = [
@@ -229,7 +229,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                 with open(additional_file) as f:
                     modify_before_test[workflow_path][additional_file] = f.read()
         workflow_info = WorkflowInfo(
-            test_workflow_paths=list(map(str, relative_test_workflow_paths)),
+            test_workflow_paths=relative_test_workflow_paths,
             num_test_workflows=len(runnable_test_workflows),
             num_workflows=len(actions.workflows),
             num_unknown_workflows=num_unknown_workflows,
