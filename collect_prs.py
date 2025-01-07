@@ -225,9 +225,11 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
         ]
         modify_before_test = []
         for workflow_path in relative_test_workflow_paths:
-            for additional_file in data["additional_files"][workflow_path]:
-                with open(additional_file) as f:
-                    modify_before_test[workflow_path][additional_file] = f.read()
+            filename_to_content = {}
+            for filename in data["additional_files"][workflow_path]:
+                with open(filename) as f:
+                    filename_to_content[filename] = f.read()
+            modify_before_test.append(filename_to_content)
         workflow_info = WorkflowInfo(
             test_workflow_paths=relative_test_workflow_paths,
             num_test_workflows=len(runnable_test_workflows),
