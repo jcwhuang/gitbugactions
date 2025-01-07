@@ -36,7 +36,7 @@ class WorkflowInfo:
     workflow_contents: list[str]
     instance_id: str
     runnable: list[bool]
-    modify_before_test: list[dict[str, str]]
+    modify_before_tests: list[dict[str, str]]
     version: int = CURRENT_VERSION
 
     def to_json(self) -> str:
@@ -77,10 +77,6 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
         self.runner_image = f"gitbugactions:{re.sub(':', '-', self.base_image)}"
         self.uuid = str(uuid.uuid1())
 
-    def make_instance_id(self, repo: MinimalRepository):
-        repo_name = repo.full_name.replace("/", "__")
-        return f"{repo_name}-{repo.pull_number}"
-
     def save_workflow_info(self, data: dict):
         data_path = os.path.join(self.data_path, "workflow_info.json")
         with open(data_path, "w") as f:
@@ -90,7 +86,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
         """
         Saves the data json to a file with the name of the repository
         """
-        instance_id = self.make_instance_id(repo)
+        instance_id = make_instance_id(repo)
         data_path = os.path.join(self.data_path, f"{instance_id}.json")
         with open(data_path, "w") as f:
             json.dump(data, f)
@@ -175,7 +171,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             else:
                 logger.info("No test workflows")
 
-            workflow_info = self.make_workflow_info(actions, repo_path, pr, data)
+            workflow_info = make_workflow_info(actions, repo_path, pr, data)
             delete_repo_clone(repo_clone)
             self.save_data(data, pr.repo)
             self.save_workflow_info(workflow_info.to_json())
@@ -188,64 +184,69 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             delete_repo_clone(repo_clone)
             self.save_data(data, pr.repo)
 
-    def make_workflow_info(
-        self, actions: GitHubActions, repo_path: str, pr: PullRequest, data: dict
-    ):
-        runnable_test_workflows = [
-            workflow
-            for workflow in actions.test_workflows
-            if len(
-                data["actions_run"][str(Path(workflow.path).relative_to(repo_path))][
-                    "tests"
-                ]
-            )
-            > 0
-        ]
 
-        num_unknown_workflows = sum(
-            [1 for w in actions.workflows if isinstance(w, UnknownWorkflow)]
+def make_instance_id(repo: MinimalRepository):
+    """Convert repo name and pull number to an instance id."""
+    repo_name = repo.full_name.replace("/", "__")
+    return f"{repo_name}-{repo.pull_number}"
+
+
+def make_workflow_info(
+    actions: GitHubActions, repo_path: str, pr: PullRequest, data: dict
+):
+    runnable_test_workflows = [
+        workflow
+        for workflow in actions.test_workflows
+        if len(
+            data["actions_run"][str(Path(workflow.path).relative_to(repo_path))][
+                "tests"
+            ]
         )
-        test_workflow_paths = [
-            Path(workflow.path) for workflow in runnable_test_workflows
-        ]
-        relative_test_workflow_paths = [
-            str(workflow_path.relative_to(repo_path))
-            for workflow_path in test_workflow_paths
-        ]
-        report_locations = [
-            workflow.get_report_location() for workflow in runnable_test_workflows
-        ]
-        workflow_contents = [workflow.doc for workflow in runnable_test_workflows]
-        actions_test_build_tools = [
-            workflow.get_build_tool() for workflow in runnable_test_workflows
-        ]
-        runnable = [
-            len(data["actions_run"][workflow_path]["tests"]) > 0
-            for workflow_path in relative_test_workflow_paths
-        ]
-        modify_before_test = []
-        for workflow_path in relative_test_workflow_paths:
-            filename_to_content = {}
-            for filename in data["additional_files"][workflow_path]:
-                with open(filename) as f:
-                    relative_file_path = str(Path(filename).relative_to(repo_path))
-                    filename_to_content[relative_file_path] = f.read()
-            modify_before_test.append(filename_to_content)
-        workflow_info = WorkflowInfo(
-            test_workflow_paths=relative_test_workflow_paths,
-            num_test_workflows=len(runnable_test_workflows),
-            num_workflows=len(actions.workflows),
-            num_unknown_workflows=num_unknown_workflows,
-            head_language=data["language"],
-            base_language=data["language"],
-            language=data["language"],
-            commit_sha=data["base_commit"],
-            repo=pr.repo.full_name,
-            report_locations=report_locations,
-            workflow_contents=workflow_contents,
-            instance_id=self.make_instance_id(pr.repo),
-            actions_test_build_tools=actions_test_build_tools,
-            runnable=runnable,
-            modify_before_test=modify_before_test,
-        )
-        return workflow_info
+        > 0
+    ]
+
+    num_unknown_workflows = sum(
+        [1 for w in actions.workflows if isinstance(w, UnknownWorkflow)]
+    )
+    test_workflow_paths = [Path(workflow.path) for workflow in runnable_test_workflows]
+    relative_test_workflow_paths = [
+        str(workflow_path.relative_to(repo_path))
+        for workflow_path in test_workflow_paths
+    ]
+    report_locations = [
+        workflow.get_report_location() for workflow in runnable_test_workflows
+    ]
+    workflow_contents = [workflow.doc for workflow in runnable_test_workflows]
+    actions_test_build_tools = [
+        workflow.get_build_tool() for workflow in runnable_test_workflows
+    ]
+    runnable = [
+        len(data["actions_run"][workflow_path]["tests"]) > 0
+        for workflow_path in relative_test_workflow_paths
+    ]
+    modify_before_tests = []
+    for workflow_path in relative_test_workflow_paths:
+        filename_to_content = {}
+        for filename in data["additional_files"][workflow_path]:
+            with open(filename) as f:
+                relative_file_path = str(Path(filename).relative_to(repo_path))
+                filename_to_content[relative_file_path] = f.read()
+        modify_before_test.append(filename_to_content)
+    workflow_info = WorkflowInfo(
+        test_workflow_paths=relative_test_workflow_paths,
+        num_test_workflows=len(runnable_test_workflows),
+        num_workflows=len(actions.workflows),
+        num_unknown_workflows=num_unknown_workflows,
+        head_language=data["language"],
+        base_language=data["language"],
+        language=data["language"],
+        commit_sha=data["base_commit"],
+        repo=pr.repo.full_name,
+        report_locations=report_locations,
+        workflow_contents=workflow_contents,
+        instance_id=make_instance_id(pr.repo),
+        actions_test_build_tools=actions_test_build_tools,
+        runnable=runnable,
+        modify_before_tests=modify_before_tests,
+    )
+    return workflow_info
