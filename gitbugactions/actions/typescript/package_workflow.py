@@ -113,3 +113,6 @@ class PackageWorkflow(GitHubWorkflow):
     @abstractmethod
     def _get_test_keyword(self, command: str) -> str:
         pass
+
+    def get_additional_files(self) -> list[str]:
+        return [str(Path(self.repo_path) / "package.json")]

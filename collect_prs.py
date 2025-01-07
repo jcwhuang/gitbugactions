@@ -35,6 +35,8 @@ class WorkflowInfo:
     report_locations: list[str]
     workflow_contents: list[str]
     instance_id: str
+    runnable: list[bool]
+    modify_before_test: list[dict[str, str]]
     version: int = CURRENT_VERSION
 
     def to_json(self) -> str:
@@ -113,6 +115,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             "number_of_test_actions": 0,
             "actions_successful": {},
             "actions_run": {},
+            "additional_files": {},
         }
 
         repo_clone = clone_repo(pr.repo.clone_url, repo_path)
@@ -166,6 +169,9 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                         relative_workflow_path
                     ] = not act_run.failed
                     data["actions_run"][relative_workflow_path] = act_run.asdict()
+                    data["additional_files"][relative_workflow_path] = (
+                        actions.test_workflows[i].get_additional_files()
+                    )
             else:
                 logger.info("No test workflows")
 
@@ -185,26 +191,46 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
     def make_workflow_info(
         self, actions: GitHubActions, repo_path: str, pr: PullRequest, data: dict
     ):
+        runnable_test_workflows = [
+            workflow
+            for workflow in actions.test_workflows
+            if len(
+                data["actions_run"][str(Path(workflow.path).relative_to(repo_path))][
+                    "tests"
+                ]
+            )
+            > 0
+        ]
+
         num_unknown_workflows = sum(
             [1 for w in actions.workflows if isinstance(w, UnknownWorkflow)]
         )
         test_workflow_paths = [
-            Path(workflow.path) for workflow in actions.test_workflows
+            Path(workflow.path) for workflow in runnable_test_workflows
         ]
         relative_test_workflow_paths = [
             workflow_path.relative_to(repo_path)
             for workflow_path in test_workflow_paths
         ]
         report_locations = [
-            workflow.get_report_location() for workflow in actions.test_workflows
+            workflow.get_report_location() for workflow in runnable_test_workflows
         ]
-        workflow_contents = [workflow.doc for workflow in actions.test_workflows]
+        workflow_contents = [workflow.doc for workflow in runnable_test_workflows]
         actions_test_build_tools = [
-            workflow.get_build_tool() for workflow in actions.test_workflows
+            workflow.get_build_tool() for workflow in runnable_test_workflows
         ]
+        runnable = [
+            len(data["actions_run"][workflow_path]["tests"]) > 0
+            for workflow_path in relative_test_workflow_paths
+        ]
+        modify_before_test = []
+        for workflow_path in relative_test_workflow_paths:
+            for additional_file in data["additional_files"][workflow_path]:
+                with open(additional_file) as f:
+                    modify_before_test[workflow_path][additional_file] = f.read()
         workflow_info = WorkflowInfo(
             test_workflow_paths=list(map(str, relative_test_workflow_paths)),
-            num_test_workflows=len(actions.test_workflows),
+            num_test_workflows=len(runnable_test_workflows),
             num_workflows=len(actions.workflows),
             num_unknown_workflows=num_unknown_workflows,
             head_language=data["language"],
@@ -216,5 +242,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             workflow_contents=workflow_contents,
             instance_id=self.make_instance_id(pr.repo),
             actions_test_build_tools=actions_test_build_tools,
+            runnable=runnable,
+            modify_before_test=modify_before_test,
         )
         return workflow_info

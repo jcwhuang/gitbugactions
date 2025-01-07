@@ -362,3 +362,6 @@ class GitHubWorkflow(ABC):
     @abstractmethod
     def get_report_location(self) -> str:
         pass
+
+    def get_additional_files(self) -> list[str]:
+        pass
