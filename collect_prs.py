@@ -228,9 +228,8 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             filename_to_content = {}
             for filename in data["additional_files"][workflow_path]:
                 with open(filename) as f:
-                    filename_to_content[Path(filename).relative_to(repo_path)] = (
-                        f.read()
-                    )
+                    relative_file_path = str(Path(filename).relative_to(repo_path))
+                    filename_to_content[relative_file_path] = f.read()
             modify_before_test.append(filename_to_content)
         workflow_info = WorkflowInfo(
             test_workflow_paths=relative_test_workflow_paths,
