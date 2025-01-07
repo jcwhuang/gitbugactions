@@ -121,7 +121,6 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             actions = GitHubActions(
                 repo_path,
                 pr.repo.language,
-                runner_image=self.runner_image,
             )
             data["number_of_actions"] = len(actions.workflows)
             data["actions_build_tools"] = [
