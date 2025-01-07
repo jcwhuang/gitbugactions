@@ -35,7 +35,6 @@ class WorkflowInfo:
     report_locations: list[str]
     workflow_contents: list[str]
     instance_id: str
-    runnable: list[bool]
     modify_before_tests: list[dict[str, str]]
     version: int = CURRENT_VERSION
 
@@ -220,10 +219,6 @@ def make_workflow_info(
     actions_test_build_tools = [
         workflow.get_build_tool() for workflow in runnable_test_workflows
     ]
-    runnable = [
-        len(data["actions_run"][workflow_path]["tests"]) > 0
-        for workflow_path in relative_test_workflow_paths
-    ]
     modify_before_tests = []
     for workflow_path in relative_test_workflow_paths:
         filename_to_content = {}
@@ -246,7 +241,6 @@ def make_workflow_info(
         workflow_contents=workflow_contents,
         instance_id=make_instance_id(pr.repo),
         actions_test_build_tools=actions_test_build_tools,
-        runnable=runnable,
         modify_before_tests=modify_before_tests,
     )
     return workflow_info
