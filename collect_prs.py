@@ -70,10 +70,8 @@ class PullRequestStrategy(ABC):
 
 
 class HandlePullRequestsStrategy(PullRequestStrategy):
-    def __init__(self, data_path: str, base_image: str):
+    def __init__(self, data_path: str):
         self.data_path = data_path
-        self.base_image = base_image
-        self.runner_image = f"gitbugactions:{re.sub(':', '-', self.base_image)}"
         self.uuid = str(uuid.uuid1())
 
     def save_workflow_info(self, data: dict):
@@ -124,7 +122,6 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                 repo_path,
                 pr.repo.language,
                 runner_image=self.runner_image,
-                base_image=self.base_image,
             )
             data["number_of_actions"] = len(actions.workflows)
             data["actions_build_tools"] = [

@@ -11,11 +11,9 @@ logger = get_logger(__name__)
 def handle_repos(
     prdata_filename: str,
     out_path: str = "../out/",
-    base_image: str = "ubuntu:js-latest",
 ):
-    logger.info(f"Base image: {base_image}")
     os.makedirs(out_path)
-    strategy = HandlePullRequestsStrategy(out_path, base_image)
+    strategy = HandlePullRequestsStrategy(out_path)
     with open(prdata_filename) as f:
         prdata = json.load(f)
     repo = MinimalRepository(
