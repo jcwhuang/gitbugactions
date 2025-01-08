@@ -259,7 +259,7 @@ class Act:
         self.flags += f" --memory={Act.__MEMORY_LIMIT}"
         self.flags += "'"
 
-        self.__DEFAULT_RUNNERS = f"-P ubuntu-latest=codemodelacr.azurecr.io/genai-latest:20250107.jadhuang.testyarn"
+        self.__DEFAULT_RUNNERS = f"-P ubuntu-latest=codemodelacr.azurecr.io/genai-latest:latest"
         self.timeout = timeout
         self.fail_strategy = fail_strategy
 
