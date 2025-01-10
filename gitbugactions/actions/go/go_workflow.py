@@ -31,7 +31,7 @@ class GoWorkflow(GitHubWorkflow):
         if self.has_tests():
             for _, job in self.doc["jobs"].items():
                 if "steps" in job:
-                    for step in job["steps"]:
+                    for i, step in enumerate(job["steps"]):
                         if "run" in step and self._is_test_command(step["run"]):
                             break
                     else:
@@ -40,7 +40,7 @@ class GoWorkflow(GitHubWorkflow):
                     # Job with tests
                     # We need to install the go-test-report package to generate the reports
                     job["steps"].insert(
-                        0,
+                        i,
                         {
                             "name": "gitbug-actions install go-junit-report",
                             "run": "go install github.com/jstemmer/go-junit-report/v2@v2.0.0",
