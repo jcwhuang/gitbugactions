@@ -416,32 +416,43 @@ class GitHubActions:
                     os.path.join(dirpath, file), self.language, repo_path=repo_path
                 )
 
-                self.workflows.append(workflow)
-                if not workflow.has_tests() or workflow.has_matrix_include_exclude():
-                    continue
+                # Given CES restrictions about one job per workflow:
+                workflows: list[GitHubWorkflow] = (
+                    GitHubWorkflowFactory.split_workflow_by_jobs(workflow)
+                )
 
-                workflow.instrument_os()
-                workflow.instrument_on_events()
-                workflow.instrument_strategy()
-                workflow.instrument_jobs()
-                workflow.instrument_cache_steps()
-                workflow.instrument_setup_steps()
-                workflow.instrument_test_steps()
-                workflow.rename_test_step()
-                if offline:
-                    workflow.instrument_offline_execution()
-                else:
-                    workflow.instrument_online_execution()
-                if rename_test_workflows:
-                    filename = os.path.basename(workflow.path)
-                    dirpath = os.path.dirname(workflow.path)
-                    new_filename = (
-                        filename.split(".")[0] + "-crawler." + filename.split(".")[1]
-                    )
-                    new_path = os.path.join(dirpath, new_filename)
-                    workflow.path = new_path
+                for workflow in workflows:
+                    self.workflows.append(workflow)
+                    if (
+                        not workflow.has_tests()
+                        or workflow.has_matrix_include_exclude()
+                    ):
+                        continue
 
-                self.test_workflows.append(workflow)
+                    workflow.instrument_os()
+                    workflow.instrument_on_events()
+                    workflow.instrument_strategy()
+                    workflow.instrument_jobs()
+                    workflow.instrument_cache_steps()
+                    workflow.instrument_setup_steps()
+                    workflow.instrument_test_steps()
+                    workflow.rename_test_step()
+                    if offline:
+                        workflow.instrument_offline_execution()
+                    else:
+                        workflow.instrument_online_execution()
+                    if rename_test_workflows:
+                        filename = os.path.basename(workflow.path)
+                        dirpath = os.path.dirname(workflow.path)
+                        new_filename = (
+                            filename.split(".")[0]
+                            + "-crawler."
+                            + filename.split(".")[1]
+                        )
+                        new_path = os.path.join(dirpath, new_filename)
+                        workflow.path = new_path
+
+                    self.test_workflows.append(workflow)
 
     def get_actions(self) -> Set[Action]:
         actions: Set[Action] = set()

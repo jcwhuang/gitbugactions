@@ -70,9 +70,10 @@ class PullRequestStrategy(ABC):
 
 
 class HandlePullRequestsStrategy(PullRequestStrategy):
-    def __init__(self, data_path: str):
+    def __init__(self, data_path: str, test_runnability: bool = False):
         self.data_path = data_path
         self.uuid = str(uuid.uuid1())
+        self.test_runnability = test_runnability
 
     def save_workflow_info(self, data: dict):
         data_path = os.path.join(self.data_path, "workflow_info.json")
@@ -146,20 +147,23 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                     actions.test_workflows[i].doc["name"] = str(uuid.uuid4())
                     actions.save_workflows()
 
-                    act_cache_dir = ActCacheDirManager.acquire_act_cache_dir()
-                    try:
-                        act_run = actions.run_workflow(
-                            actions.test_workflows[i],
-                            act_cache_dir=act_cache_dir,
-                            act_fail_strategy=ActCheckCodeFailureStrategy(),
-                        )
-                    finally:
-                        ActCacheDirManager.return_act_cache_dir(act_cache_dir)
+                    if self.test_runnability:
+                        act_cache_dir = ActCacheDirManager.acquire_act_cache_dir()
+                        try:
+                            act_run = actions.run_workflow(
+                                actions.test_workflows[i],
+                                act_cache_dir=act_cache_dir,
+                                act_fail_strategy=ActCheckCodeFailureStrategy(),
+                            )
+                        finally:
+                            ActCacheDirManager.return_act_cache_dir(act_cache_dir)
 
-                    data["actions_successful"][
-                        relative_workflow_path
-                    ] = not act_run.failed
-                    data["actions_run"][relative_workflow_path] = act_run.asdict()
+                    data["actions_successful"][relative_workflow_path] = (
+                        not act_run.failed if act_run else None
+                    )
+                    data["actions_run"][relative_workflow_path] = (
+                        act_run.asdict() if act_run else None
+                    )
                     data["additional_files"][relative_workflow_path] = (
                         actions.test_workflows[i].get_additional_files()
                     )

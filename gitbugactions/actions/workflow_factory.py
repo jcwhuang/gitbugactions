@@ -1,3 +1,6 @@
+import copy
+import re
+import os
 import yaml
 from gitbugactions.actions.workflow import GitHubWorkflow
 from gitbugactions.actions.multi.unknown_workflow import UnknownWorkflow
@@ -112,3 +115,24 @@ class GitHubWorkflowFactory:
                 return YarnWorkflow(path, repo_path=repo_path, workflow=content)
             case (_, _):
                 return UnknownWorkflow(path, repo_path=repo_path, workflow=content)
+
+    @staticmethod
+    def split_workflow_by_jobs(workflow: GitHubWorkflow) -> list[GitHubWorkflow]:
+
+        new_workflows: list[GitHubWorkflow] = []
+        if workflow.has_tests() and "jobs" in workflow.doc:
+            for job_key, job in workflow.doc["jobs"].items():
+                new_workflow = copy.deepcopy(workflow)
+                new_workflow.doc["jobs"] = {job_key: job}
+                # Update path with job key
+                filename = os.path.basename(new_workflow.path)
+                dirpath = os.path.dirname(new_workflow.path)
+                new_filename = (
+                    filename.split(".")[0]
+                    + f"-{re.sub(' ', '', job_key)}."
+                    + filename.split(".")[1]
+                )
+                new_path = os.path.join(dirpath, new_filename)
+                new_workflow.path = new_path
+                new_workflows.append(new_workflow)
+        return new_workflows
