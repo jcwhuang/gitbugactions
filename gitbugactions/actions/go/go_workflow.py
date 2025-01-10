@@ -47,7 +47,7 @@ class GoWorkflow(GitHubWorkflow):
                         i,
                         {
                             "name": "gitbug-actions install go-junit-report",
-                            "run": "go install github.com/jstemmer/go-junit-report/v2@v2.0.0 && ls -la $HOME/go/bin && echo $HOME/go/bin >> $GITHUB_PATH",
+                            "run": "go install github.com/jstemmer/go-junit-report/v2@v2.0.0 && ls -la $GOPATH/bin && ls -la $HOME/go/bin && echo $HOME/go/bin >> $GITHUB_PATH",
                         },
                     )
                     # We need to generate the vendor to keep dependencies
