@@ -142,7 +142,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                         Path(test_workflow.path).relative_to(repo_path)
                     )
                     logger.info(f"Running test workflow {i}: {relative_workflow_path}")
-                    logger.info(f"Workflow contents: {test_workflow.doc}")
+                    logger.info(f"Workflow contents: {json.dumps(test_workflow.doc)}")
                     # Act creates names for the containers by hashing the content of the workflows
                     # To avoid conflicts between threads, we randomize the name
                     actions.test_workflows[i].doc["name"] = str(uuid.uuid4())
