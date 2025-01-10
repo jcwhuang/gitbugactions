@@ -170,7 +170,9 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
             else:
                 logger.info("No test workflows")
 
-            workflow_info = make_workflow_info(actions, repo_path, pr, data)
+            workflow_info = make_workflow_info(
+                actions, repo_path, pr, data, self.test_runnability
+            )
             delete_repo_clone(repo_clone)
             self.save_data(data, pr.repo)
             self.save_workflow_info(workflow_info.to_json())
@@ -191,18 +193,25 @@ def make_instance_id(repo: MinimalRepository):
 
 
 def make_workflow_info(
-    actions: GitHubActions, repo_path: str, pr: PullRequest, data: dict
+    actions: GitHubActions,
+    repo_path: str,
+    pr: PullRequest,
+    data: dict,
+    test_runnability: bool,
 ):
-    runnable_test_workflows = [
-        workflow
-        for workflow in actions.test_workflows
-        if len(
-            data["actions_run"][str(Path(workflow.path).relative_to(repo_path))][
-                "tests"
-            ]
-        )
-        > 0
-    ]
+    if test_runnability:
+        runnable_test_workflows = [
+            workflow
+            for workflow in actions.test_workflows
+            if len(
+                data["actions_run"][str(Path(workflow.path).relative_to(repo_path))][
+                    "tests"
+                ]
+            )
+            > 0
+        ]
+    else:
+        runnable_test_workflows = actions.test_workflows
 
     num_unknown_workflows = sum(
         [1 for w in actions.workflows if isinstance(w, UnknownWorkflow)]
