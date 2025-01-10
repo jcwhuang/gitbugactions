@@ -43,8 +43,6 @@ class GitHubWorkflow(ABC):
         self.path = path
         self.repo_path = repo_path
         self.tokens: List[GithubToken] = []
-        self.num_jobs = len(self.doc["jobs"]) if "jobs" in self.doc else 0
-        self.num_filtered_jobs = 0
 
     @abstractmethod
     def _is_test_command(self, command) -> bool:
