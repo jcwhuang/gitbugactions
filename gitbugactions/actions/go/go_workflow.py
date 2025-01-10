@@ -2,9 +2,13 @@ from typing import List, Tuple
 from junitparser import TestCase
 from pathlib import Path
 import re
+import subprocess
 
 from gitbugactions.actions.workflow import GitHubWorkflow
 from gitbugactions.actions.multi.junitxmlparser import JUnitXMLParser
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class GoWorkflow(GitHubWorkflow):
@@ -141,6 +145,9 @@ class GoWorkflow(GitHubWorkflow):
 
     def get_test_results(self, repo_path) -> List[TestCase]:
         parser = JUnitXMLParser()
+        logger.info(f"Looking for test results at {repo_path}")
+        run = subprocess.run(f"ls {repo_path}", shell=True, capture_output=True)
+        logger.info(f"Results of ls {repo_path}: {run.stdout}")
         return parser.get_test_results(str(Path(repo_path, "report.xml")))
 
     def get_build_tool(self) -> str:
