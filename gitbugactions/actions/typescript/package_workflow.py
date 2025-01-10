@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from junitparser import TestCase
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import json
 import subprocess
 
@@ -112,5 +112,5 @@ class PackageWorkflow(GitHubWorkflow):
     def _get_test_keyword(self, command: str) -> str:
         pass
 
-    def get_additional_files(self) -> list[str]:
+    def get_additional_files(self) -> Optional[list[str]]:
         return [str(Path(self.repo_path) / "package.json")]

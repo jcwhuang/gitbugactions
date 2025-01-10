@@ -1,7 +1,7 @@
 import yaml
 from abc import ABC, abstractmethod
 from junitparser import TestCase
-from typing import List, Set
+from typing import List, Set, Optional
 from gitbugactions.github_api import GithubToken
 from gitbugactions.actions.action import Action
 from gitbugactions.logger import get_logger
@@ -363,5 +363,5 @@ class GitHubWorkflow(ABC):
     def get_report_location(self) -> str:
         pass
 
-    def get_additional_files(self) -> list[str]:
+    def get_additional_files(self) -> Optional[list[str]]:
         pass
