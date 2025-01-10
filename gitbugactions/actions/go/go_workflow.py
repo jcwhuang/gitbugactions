@@ -140,7 +140,7 @@ class GoWorkflow(GitHubWorkflow):
                             else:
                                 step["run"] = (
                                     step["run"]
-                                    # + " 2>&1 | $GOPATH/bin/go-junit-report > report.xml"
+                                    + " 2>&1 | $GOPATH/bin/go-junit-report > report.xml"
                                 )
 
     def get_test_results(self, repo_path) -> List[TestCase]:
