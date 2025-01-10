@@ -146,7 +146,7 @@ class HandlePullRequestsStrategy(PullRequestStrategy):
                     # To avoid conflicts between threads, we randomize the name
                     actions.test_workflows[i].doc["name"] = str(uuid.uuid4())
                     actions.save_workflows()
-
+                    act_run = None
                     if self.test_runnability:
                         act_cache_dir = ActCacheDirManager.acquire_act_cache_dir()
                         try:
