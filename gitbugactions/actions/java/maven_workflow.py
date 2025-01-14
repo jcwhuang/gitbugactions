@@ -2,9 +2,13 @@ from typing import List
 from junitparser import TestCase
 from pathlib import Path
 import re
+import subprocess
 
 from gitbugactions.actions.workflow import GitHubWorkflow
 from gitbugactions.actions.multi.junitxmlparser import JUnitXMLParser
+from gitbugactions.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class MavenWorkflow(GitHubWorkflow):
@@ -36,9 +40,14 @@ class MavenWorkflow(GitHubWorkflow):
 
     def get_test_results(self, repo_path) -> List[TestCase]:
         parser = JUnitXMLParser()
-        return parser.get_test_results(
-            str(Path(repo_path, "target", "surefire-reports"))
-        )
+        test_path = str(Path(repo_path, "target", "surefire-reports"))
+        logger.info(f"Looking for test results at repo_path: {repo_path}")
+        run = subprocess.run(f"ls {repo_path}", shell=True, capture_output=True)
+        logger.info(f"Results of ls {repo_path}: {run.stdout}")
+        logger.info(f"Looking for test results at test_path: {test_path}")
+        run = subprocess.run(f"ls {test_path}", shell=True, capture_output=True)
+        logger.info(f"Results of ls {test_path}: {run.stdout}")
+        return parser.get_test_results(test_path)
 
     def get_build_tool(self) -> str:
         return "maven"
