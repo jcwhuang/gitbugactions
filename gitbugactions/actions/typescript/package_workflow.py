@@ -52,8 +52,7 @@ class PackageWorkflow(GitHubWorkflow):
 
     def instrument_test_steps(self):
         if "jobs" in self.doc:
-            filtered_jobs = {}
-            for job_key, job in self.doc["jobs"].items():
+            for _, job in self.doc["jobs"].items():
                 if "steps" in job:
                     for step in job["steps"]:
                         if "run" in step and self._is_test_command(step["run"]):
@@ -85,15 +84,8 @@ class PackageWorkflow(GitHubWorkflow):
                                 logger.info(f"New test command is {test_command}")
                                 with open(package_json_path, "w") as f:
                                     package_json = json.dump(package_json, f)
-
-                                # Reduce the workflow to only this job for CES-compatibility
-                                filtered_jobs[job_key] = job
-                                break
                             else:
                                 logger.info("No test command found in package.json.")
-                    if filtered_jobs:
-                        break
-            self.doc["jobs"] = filtered_jobs
 
     def get_build_tool(self) -> str:
         return f"{self.build_tool_keyword}, {self.test_command}"

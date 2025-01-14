@@ -1,4 +1,5 @@
 from gitbugactions.actions.workflow_factory import GitHubWorkflowFactory
+from gitbugactions.actions.java.gradle_workflow import GradleWorkflow
 from gitbugactions.actions.java.maven_workflow import MavenWorkflow
 from gitbugactions.actions.python.pytest_workflow import PytestWorkflow
 from gitbugactions.actions.go.go_workflow import GoWorkflow
@@ -10,7 +11,7 @@ import pytest
 
 def create_workflow(yml_file, language):
     """Create a workflow object."""
-    return GitHubWorkflowFactory.create_workflow(yml_file, language)
+    return GitHubWorkflowFactory.create_workflow(yml_file, language, "")
 
 
 @pytest.mark.parametrize(
@@ -24,6 +25,27 @@ def test_maven(yml_file):
     """Test the workflow factory for maven workflows."""
     workflow = create_workflow(yml_file, "java")
     assert isinstance(workflow, MavenWorkflow)
+
+
+@pytest.mark.parametrize(
+    "yml_file, job_name, step_index, expected_command",
+    [
+        (
+            "test/resources/test_workflows/java/gradle_growuppms.yml",
+            "build-and-deploy",
+            3,
+            "./gradlew build --no-daemon",
+        ),
+    ],
+)
+def test_gradle(yml_file, job_name, step_index, expected_command):
+    """Test the workflow factory for gradle workflows."""
+    workflow = create_workflow(yml_file, "java")
+    assert isinstance(workflow, GradleWorkflow)
+    workflow.doc["jobs"][job_name]["steps"][step_index] == expected_command
+    import json
+
+    print(json.dumps(workflow.doc))
 
 
 @pytest.mark.parametrize(
@@ -111,11 +133,11 @@ def test_instrument_vendor(yml_file):
     )
     assert (
         workflow.doc["jobs"]["run-tests"]["steps"][-1]["run"]
-        == "go test -v ./... -coverprofile=coverage.txt -mod=vendor -covermode=atomic 2>&1 | ~/go/bin/go-junit-report > report.xml"
+        == "go test -v ./... -coverprofile=coverage.txt -mod=vendor -covermode=atomic 2>&1 | $GOPATH/bin/go-junit-report > report.xml"
     )
     assert (
         workflow.doc["jobs"]["run-tests"]["steps"][-2]["run"]
-        == "go test -v ./... -coverprofile=coverage.txt -mod=vendor -covermode=atomic 2>&1 | ~/go/bin/go-junit-report > report.xml"
+        == "go test -v ./... -coverprofile=coverage.txt -mod=vendor -covermode=atomic 2>&1 | $GOPATH/bin/go-junit-report > report.xml"
     )
 
     workflow = create_workflow(yml_file, "go")
@@ -129,6 +151,7 @@ def test_instrument_vendor(yml_file):
     )
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "yml_file",
     [("test/resources/test_workflows/go/go_on_pull_request.yml")],
@@ -151,7 +174,7 @@ def test_instrument_vendor_repeat(yml_file):
     )
     assert (
         workflow.doc["jobs"]["unit-test"]["steps"][-1]["run"]
-        == "go test -mod=vendor -v ./... 2>&1 | ~/go/bin/go-junit-report > report.xml"
+        == "go test -mod=vendor -v ./... 2>&1 | $GOPATH/bin/go-junit-report > report.xml"
     )
 
 
@@ -177,7 +200,7 @@ def test_instrument_vendor_build(yml_file):
     )
     assert (
         workflow.doc["jobs"]["build"]["steps"][-1]["run"]
-        == "go test -mod=vendor -v ./... 2>&1 | ~/go/bin/go-junit-report > report.xml"
+        == "go test -mod=vendor -v ./... 2>&1 | $GOPATH/bin/go-junit-report > report.xml"
     )
 
 

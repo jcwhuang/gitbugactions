@@ -27,7 +27,14 @@ class GradleWorkflow(GitHubWorkflow):
         return False
 
     def instrument_test_steps(self):
-        pass
+        if "jobs" in self.doc:
+            for _, job in self.doc["jobs"].items():
+                if "steps" in job:
+                    for step in job["steps"]:
+                        if "run" in step and self._is_test_command(step["run"]):
+                            step["run"] = step["run"].strip()
+                            if "-x test" in step["run"]:
+                                step["run"] = step["run"].replace("-x test", "").strip()
 
     def instrument_offline_execution(self):
         # Add an "--offline" option to the test command
